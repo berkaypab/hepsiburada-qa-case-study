@@ -31,6 +31,9 @@ test.describe(
 					const result = await searchPage.selectRandomProduct();
 					selectedProductTitle = result.title;
 					listingPrice = result.price;
+					// PageAssertions: ürün detay sayfasına ulaşıldı mı? (URL doğrulama)
+					// Hepsiburada URL'lerinde "-p-" veya "-pm-" geçebilir
+					await expect(homePage.page).toHaveURL(/hepsiburada\.com\/.*-p(m)?-/i, { timeout: 10000 });
 				});
 
 				await test.step("Ürün detay sayfasını doğrula (başlık eşleşmesi)", async () => {

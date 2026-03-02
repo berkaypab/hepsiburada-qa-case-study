@@ -29,6 +29,9 @@ test.describe(
 					const result = await searchPage.selectRandomProduct();
 					selectedProductTitle = result.title;
 					listingPrice = result.price;
+					// PageAssertions: ürün detay sayfasına ulaşıldı mı? (URL doğrulama)
+					// Hepsiburada URL'lerinde "-p-" veya "-pm-" geçebilir
+					await expect(homePage.page).toHaveURL(/hepsiburada\.com\/.*-p(m)?-/i, { timeout: 10000 });
 				});
 
 				await test.step("Verify detail page product matches the selected listing product", async () => {
@@ -53,6 +56,9 @@ test.describe(
 
 				await test.step("Navigate to Reviews tab and sort by newest", async () => {
 					await productDetailPage.clickReviewsTab();
+					// PageAssertions: URL '-yorumlari' ile bitiyor mu? (ReviewsTab navigasyon doğrulaması)
+					await expect(homePage.page).toHaveURL(/-yorumlari$/, { timeout: 10000 });
+
 					const hasReviews = await reviewsPage.hasReviews();
 
 					if (!hasReviews) {
