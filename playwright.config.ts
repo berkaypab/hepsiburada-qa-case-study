@@ -16,6 +16,14 @@ export default defineConfig({
 	timeout: 60000,
 	fullyParallel: true,
 
+	/** Test raporu ve CI analizi için ekstra metadatalar */
+	metadata: {
+		environment: process.env.CI ? "ci" : "local",
+	},
+
+	/** .gitignore'daki dizinleri test armalarından dışla (Playwright default) */
+	respectGitIgnore: true,
+
 	/** CI'da test.only bırakılmışsa build başarısız olsun */
 	forbidOnly: !!process.env.CI,
 
@@ -48,11 +56,20 @@ export default defineConfig({
 
 	projects: [
 		{
+			name: "setup",
+			testMatch: /.*\.setup\.ts/,
+			use: {
+				...devices["Desktop Firefox"],
+			},
+		},
+
+		{
 			name: "api",
 			testMatch: /.*api\/.*\.spec\.ts/,
 			use: {
 				baseURL: process.env.SWAGGER_API_BASE_URL,
 			},
+			dependencies: ["setup"],
 		},
 
 		// ── Chromium (DISABLED DUE TO BOT PROTECTION)
@@ -73,6 +90,7 @@ export default defineConfig({
 			use: {
 				...devices["Desktop Firefox"],
 			},
+			dependencies: ["setup"],
 		},
 
 		// ── WebKit (Safari)
@@ -82,6 +100,7 @@ export default defineConfig({
 			use: {
 				...devices["Desktop Safari"],
 			},
+			dependencies: ["setup"],
 		},
 
 		// Mobile viewport testleri
