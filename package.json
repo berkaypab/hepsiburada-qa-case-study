@@ -1,0 +1,41 @@
+{
+	"name": "hepsiburada-qa-automation",
+	"version": "1.0.0",
+	"description": "Playwright TypeScript testing framework built for the QA Assignment automation.",
+	"scripts": {
+		"setup": "npm ci && npx playwright install",
+		"prettier": "npx prettier --check .",
+		"prettier:fix": "npx prettier --write .",
+		"eslint": "npx eslint .",
+		"eslint:fix": "npx eslint . --fix",
+		"test": "npx playwright test",
+		"test:ui": "npx playwright test --ui",
+		"test:api": "npx playwright test --project=api",
+		"test:e2e": "npx playwright test --project=chromium",
+		"test:headed": "npx playwright test --headed",
+		"test:trace": "npx playwright test --trace",
+		"test:regression": "npx playwright test --grep @regression",
+		"test:customer": "npx playwright test --grep @customer",
+		"test:report:playwright": "playwright show-report reports/playwright-report"
+	},
+	"keywords": [],
+	"devDependencies": {
+		"@eslint/js": "^9.24.0",
+		"@playwright/test": "^1.56.1",
+		"@types/node": "^24.0.3",
+		"@typescript-eslint/eslint-plugin": "^8.29.1",
+		"@typescript-eslint/parser": "^8.29.1",
+		"eslint": "^9.24.0",
+		"eslint-config-prettier": "^10.1.1",
+		"eslint-plugin-prettier": "^5.2.6",
+		"globals": "^16.0.0",
+		"prettier": "^3.5.3",
+		"ts-node": "^10.9.2",
+		"tslib": "^2.8.1",
+		"typescript": "^5.8.3",
+		"typescript-eslint": "^8.29.1"
+	},
+	"dependencies": {
+		"dotenv": "^16.4.7"
+	}
+}
