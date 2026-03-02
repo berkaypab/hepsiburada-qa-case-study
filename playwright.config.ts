@@ -74,16 +74,26 @@ export default defineConfig({
 			dependencies: ["setup"],
 		},
 
-		// ── Chromium (DISABLED DUE TO BOT PROTECTION)
-		/*
+		/*// ── Chromium (Base Engine)
 		{
 			name: "chromium",
 			testMatch: /.*e2e\/.*\.spec\.ts/,
 			use: {
 				...devices["Desktop Chrome"],
 			},
+			dependencies: ["setup"],
+		},*/
+
+		// ── Native Google Chrome (Branded)
+		{
+			name: "Google Chrome",
+			testMatch: /.*e2e\/.*\.spec\.ts/,
+			use: {
+				...devices["Desktop Chrome"],
+				channel: "chrome", // Specifying channel uses the actual Google Chrome installed on the user's machine
+			},
+			dependencies: ["setup"],
 		},
-		*/
 
 		// ── Firefox
 		{
