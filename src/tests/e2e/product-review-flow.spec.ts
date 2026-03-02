@@ -3,11 +3,11 @@ import { test, expect } from "./fixtures/pages-fixture";
 import { TAGS, TIMEOUTS } from "@utils/configuration";
 
 test.describe(
-	"Hepsiburada — Senaryo 1: Ürün Değlendirme Testi",
+	"Hepsiburada — Scenario 1: Product Review Test",
 	{
 		annotation: {
 			type: "feature",
-			description: "Senaryo-1: Arama → Ürün Detay → Yorumlar → Thumbs Up",
+			description: "Scenario-1: Search → Product Detail → Reviews → Thumbs Up",
 		},
 	},
 	() => {
@@ -29,8 +29,8 @@ test.describe(
 					const result = await searchPage.selectRandomProduct();
 					selectedProductTitle = result.title;
 					listingPrice = result.price;
-					// PageAssertions: ürün detay sayfasına ulaşıldı mı? (URL doğrulama)
-					// Hepsiburada URL'lerinde "-p-" veya "-pm-" geçebilir
+					// PageAssertions: check if product detail page is reached (URL validation)
+					// Hepsiburada URLs may contain "-p-" or "-pm-"
 					await expect(homePage.page).toHaveURL(/hepsiburada\.com\/.*-p(m)?-/i, { timeout: 10000 });
 				});
 
@@ -39,7 +39,7 @@ test.describe(
 
 					await expect(
 						productDetailPage.productTitleLocator,
-						`Sayfa başlığı beklenen "${partialKey}" kelimelerini içermiyor`,
+						`Page title does not contain the expected words: "${partialKey}"`,
 					).toContainText(partialKey, { ignoreCase: true });
 				});
 
@@ -50,13 +50,13 @@ test.describe(
 					}
 
 					expect
-						.soft(detailPrice, `Listing (${listingPrice} TL) ↔ Detay (${detailPrice} TL) eşleşmiyor`)
+						.soft(detailPrice, `Listing (${listingPrice} TL) ↔ Detail (${detailPrice} TL) prices do not match`)
 						.toBe(listingPrice);
 				});
 
 				await test.step("Navigate to Reviews tab and sort by newest", async () => {
 					await productDetailPage.clickReviewsTab();
-					// PageAssertions: URL '-yorumlari' ile bitiyor mu? (ReviewsTab navigasyon doğrulaması)
+					// PageAssertions: check if URL ends with '-yorumlari' (ReviewsTab navigation verification)
 					await expect(homePage.page).toHaveURL(/-yorumlari$/, { timeout: 10000 });
 
 					const hasReviews = await reviewsPage.hasReviews();

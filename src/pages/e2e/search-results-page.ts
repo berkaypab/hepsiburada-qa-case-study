@@ -79,7 +79,7 @@ export class SearchResultsPage extends BasePage {
 			expect(validData.price).toBeTruthy();
 		}).toPass({ timeout: 15000, intervals: [500, 1000] });
 
-		if (!validData) throw new Error("Geçerli bir ürün kartı bulunamadı.");
+		if (!validData) throw new Error("No valid product card found.");
 		return validData;
 	}
 

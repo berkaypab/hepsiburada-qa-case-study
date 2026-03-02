@@ -26,15 +26,15 @@ export class ReviewsPage extends BasePage {
 	async sortByNewest(): Promise<void> {
 		await this.page.keyboard.press("End");
 
-		// Sort dropdown trigger: "Varsayılan" metni — tüm tarayıcılarda stabil
+		// Sort dropdown trigger: "Varsayılan" text — stable across all browsers
 		const sortTrigger = this.page
 			.locator("[class*='Sort-module']")
 			.getByText(/^Varsayılan$/)
 			.first();
 
-		// toPass() ile retry: cookie banner veya DOM re-render durumunda tüm diziyi yeniden dener
-		// scrollIntoViewIfNeeded() KULLANILMIYOR — click() zaten otomatik scroll yapar (Playwright docs)
-		// Ayrı bir scrollIntoViewIfNeeded() çağrısı, DOM re-render'dan sonra stale element hatasına yol açar
+		// toPass() with retry: retries the whole sequence in case of cookie banner or DOM re-renders
+		// scrollIntoViewIfNeeded() IS NOT USED — click() already handles auto-scrolling (Playwright docs)
+		// An explicit scrollIntoViewIfNeeded() call could lead to stale element errors after a DOM re-render
 		await expect(async () => {
 			await sortTrigger.waitFor({ state: "visible", timeout: TIMEOUTS.LARGE });
 			await sortTrigger.click();
@@ -42,8 +42,8 @@ export class ReviewsPage extends BasePage {
 			await this.sortNewestOption.click();
 		}).toPass({ timeout: TIMEOUTS.XXLARGE });
 
-		// Sort sonrası thumbs butonları render olana kadar bekle
-		// Sadece TimeoutError susturulur — diğer hatalar yine fırlatılır (playwright.errors API)
+		// Wait until thumbs-up buttons render after sorting
+		// Only TimeoutError is suppressed — other errors are re-thrown (playwright.errors API)
 		await this.thumbsUpButton
 			.waitFor({ state: "visible", timeout: TIMEOUTS.LARGE })
 			.catch((e: unknown) => {
@@ -52,7 +52,7 @@ export class ReviewsPage extends BasePage {
 	}
 
 	async clickThumbsUp(): Promise<void> {
-		// Scroll ile viewport'a getir → intersection observer ile render olur
+		// Scroll into viewport -> triggers intersection observer for rendering
 		await this.thumbsUpButton.scrollIntoViewIfNeeded();
 		await this.thumbsUpButton.waitFor({ state: "visible", timeout: TIMEOUTS.LARGE });
 		await this.thumbsUpButton.click();

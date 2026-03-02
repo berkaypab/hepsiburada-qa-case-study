@@ -13,15 +13,15 @@ export const test = base.extend<PagesFixture>({
 		const baseUrl = process.env.HB_BASE_URL;
 		if (!baseUrl) throw new Error("HB_BASE_URL environment variable is missing!");
 
-		// Katman 1 — context.route() (Playwright Fixtures API: context)
-		// page.route() sadece mevcut sekmeyi kapsar; context.route() tüm sekmeleri kapsar
-		// Yeni sekmeler açılsa da (popup, diğer satıcı vb.) consent intercept geçerli olur
+		// Layer 1 — context.route() (Playwright Fixtures API: context)
+		// page.route() only covers the current tab; context.route() covers all tabs
+		// Consent intercept remains valid even if new tabs (popup, other sellers, etc.) are opened
 		await context.route("**/consent/**", async (route) => {
 			await route.continue();
 		});
 
-		// Katman 2 — locatorHandler (banner yine de görünürse tıkla)
-		// noWaitAfter: true → aksiyon bloklanmaz; times: 3 → sonsuz döngü önlenir
+		// Layer 2 — locatorHandler (click the banner if it still appears)
+		// noWaitAfter: true → action is not blocked; times: 3 → prevents infinite loops
 		await page.addLocatorHandler(
 			page.locator("#onetrust-accept-btn-handler"),
 			async () => {
@@ -29,7 +29,7 @@ export const test = base.extend<PagesFixture>({
 					.locator("#onetrust-accept-btn-handler")
 					.click({ timeout: 3000 })
 					.catch((e: unknown) => {
-						// Sadece TimeoutError beklenen bir durum — diğerini fırlat
+						// Only TimeoutError is expected — re-throw others
 						if (!(e instanceof errors.TimeoutError)) throw e;
 					});
 			},

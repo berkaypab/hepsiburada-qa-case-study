@@ -53,7 +53,7 @@ export class ProductDetailPage extends BasePage {
 
 		this.otherSellersSection = page.getByTestId("other-merchants").first();
 
-		// Her dış satıcı satırı: `other-merchants` bölümü içindeki doğrudan çocuk div'ler
+		// Each other seller row: direct div children within the `other-merchants` section
 		this.otherSellerRows = this.otherSellersSection.locator("> div > div");
 	}
 
@@ -69,8 +69,8 @@ export class ProductDetailPage extends BasePage {
 			.replace(/-yorumlari$/, "");
 		const targetUrl = `${cleanUrl}-yorumlari`;
 
-		// 'commit' → Firefox NS_BINDING_ABORTED sorununu çözer (Playwright GitHub #20749)
-		// HTML stream başladığı an resolve eder, Firefox abort etmeden önce
+		// 'commit' -> resolves Firefox NS_BINDING_ABORTED issue (Playwright GitHub #20749)
+		// Resolves as soon as the HTML stream starts, before Firefox aborts the connection
 		await this.page.goto(targetUrl, { waitUntil: "commit", timeout: TIMEOUTS.LARGE });
 		await this.page.waitForLoadState("domcontentloaded");
 	}
@@ -79,7 +79,7 @@ export class ProductDetailPage extends BasePage {
 		return await this.otherSellersSection.count();
 	}
 
-	/** Ana ürün fiyatı + gözüken 2 satıcıyı karşılaştırır, en ucuz satıcının index'ini döndürür (-1 = ana ürün en ucuz). */
+	/** Compares the main product price with the visible top 2 other sellers and returns the cheapest seller's index (-1 = main product is cheapest). */
 	async getCheapestOtherSellerIndex(mainPrice: string): Promise<number> {
 		const rowCount = await this.otherSellerRows.count();
 		if (rowCount === 0) return -1;

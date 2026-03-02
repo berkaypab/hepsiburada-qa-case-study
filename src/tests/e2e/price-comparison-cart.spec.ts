@@ -2,16 +2,16 @@ import { HB_DATA } from "../../shared/mock-data/hb-data";
 import { test, expect } from "./fixtures/pages-fixture";
 import { TAGS, TIMEOUTS } from "@utils/configuration";
 test.describe(
-	"Hepsiburada — Senaryo 2: Diğer Satıcılar Fiyat Karşılaştırma",
+	"Hepsiburada — Scenario 2: Other Sellers Price Comparison",
 	{
 		annotation: {
 			type: "feature",
-			description: "Senaryo-2: Diğer satıcı fiyat karşılaştırması ve sepete ekleme",
+			description: "Scenario-2: Other seller price comparison and adding to cart",
 		},
 	},
 	() => {
 		test(
-			"iphone arama → rastgele ürün → fiyat karşılaştır → en ucuzu sepete ekle",
+			"iphone search → random product → compare price → add cheapest to cart",
 			{
 				tag: [TAGS.REGRESSION, TAGS.CUSTOMER],
 				annotation: {
@@ -31,8 +31,8 @@ test.describe(
 					const result = await searchPage.selectRandomProduct();
 					selectedProductTitle = result.title;
 					listingPrice = result.price;
-					// PageAssertions: ürün detay sayfasına ulaşıldı mı? (URL doğrulama)
-					// Hepsiburada URL'lerinde "-p-" veya "-pm-" geçebilir
+					// PageAssertions: check if product detail page is reached (URL validation)
+					// Hepsiburada URLs may contain "-p-" or "-pm-"
 					await expect(homePage.page).toHaveURL(/hepsiburada\.com\/.*-p(m)?-/i, { timeout: 10000 });
 				});
 
@@ -41,7 +41,7 @@ test.describe(
 
 					await expect(
 						productDetailPage.productTitleLocator,
-						`Sayfa başlığı beklenen "${partialKey}" kelimelerini içermiyor`,
+						`Page title does not contain the expected words: "${partialKey}"`,
 					).toContainText(partialKey);
 				});
 
@@ -52,7 +52,7 @@ test.describe(
 					}
 
 					await expect
-						.soft(detailPrice, `Listing (${listingPrice}) ↔ Detay (${detailPrice}) birbirinden farklı`)
+						.soft(detailPrice, `Listing (${listingPrice}) ↔ Detail (${detailPrice}) prices do not match`)
 						.toBe(listingPrice);
 				});
 
