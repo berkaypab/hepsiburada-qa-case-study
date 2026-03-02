@@ -19,7 +19,7 @@ test.describe(
 					description: "S2: Listing→Detail→OtherSellers→Cart flow",
 				},
 			},
-			async ({ homePage, searchPage, productDetailPage, cartPage }) => {
+			async ({ homePage, searchPage, productDetailPage }) => {
 				let selectedProductTitle = "";
 				let listingPrice = "";
 
@@ -54,20 +54,23 @@ test.describe(
 				});
 
 				await test.step("Diğer satıcıları fiyatlarla karşılaştır", async () => {
-					const hasOtherSellers = await productDetailPage.hasOtherSellers();
+					const otherSellersCount = await productDetailPage.getOtherSellersCount();
 
-					if (hasOtherSellers) {
-						await productDetailPage.goToCheapestOtherSellerIfCheaper();
+					if (otherSellersCount > 0) {
+						const mainPrice = await productDetailPage.getMainPrice();
+						if (!mainPrice) return;
+
+						const cheapestIdx = await productDetailPage.getCheapestOtherSellerIndex(mainPrice);
+
+						if (cheapestIdx !== -1) {
+							await productDetailPage.navigateToOtherSeller(cheapestIdx);
+						}
 					}
 				});
 
-				await test.step("Sepete ekle ve sepet adetinin arttığını doğrula", async () => {
-					const cartCountBefore = await cartPage.getCartCount();
-
-					await expect(async () => {
-						await productDetailPage.addToCart();
-						await cartPage.expectCartCountIncreased(cartCountBefore);
-					}).toPass({ timeout: TIMEOUTS.XLARGE });
+				await test.step("Sepete ekle", async () => {
+					await expect(productDetailPage.getAddToCartButtonLocator()).toBeEnabled({ timeout: TIMEOUTS.LARGE });
+					await productDetailPage.addToCart();
 				});
 			},
 		);

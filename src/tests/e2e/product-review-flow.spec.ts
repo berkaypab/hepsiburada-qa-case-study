@@ -1,6 +1,6 @@
 import { HB_DATA } from "../../shared/mock-data/hb-data";
 import { test, expect } from "./fixtures/pages-fixture";
-import { TAGS } from "@utils/configuration";
+import { TAGS, TIMEOUTS } from "@utils/configuration";
 
 test.describe(
 	"Hepsiburada — Senaryo 1: Ürün Değlendirme Testi",
@@ -64,8 +64,10 @@ test.describe(
 				});
 
 				await test.step("Click thumbsUp and verify thank you message", async () => {
-					await reviewsPage.clickThumbsUp();
-					await reviewsPage.expectThankYouMessage();
+					await expect(async () => {
+						await reviewsPage.clickThumbsUp();
+						await expect(reviewsPage.getThankYouMessageLocator()).toBeVisible({ timeout: TIMEOUTS.MEDIUM });
+					}).toPass({ timeout: TIMEOUTS.XLARGE });
 				});
 			},
 		);

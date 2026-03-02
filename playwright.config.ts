@@ -22,32 +22,23 @@ export default defineConfig({
 	/** CI'da başarısız testleri 2 kez daha dene */
 	retries: process.env.CI ? 2 : 0,
 
-	/** CI'da paralel koşumu kısıtla, lokalde ise CPU/Network darboğazını önlemek için max 2 worker kullanıyoruz */
-	workers: process.env.CI ? 1 : 1,
+	/** CI'da paralel koşumu kısıtla (bot protection), lokalde Playwright otomatik optimize eder */
+	workers: process.env.CI ? 1 : undefined,
 
 	reporter: process.env.CI
 		? [
-				["list"],
-				[
-					"html",
-					{ outputFolder: process.env.PLAYWRIGHT_HTML_REPORT_DIR || "reports/playwright-report", open: "never" },
-				],
-			]
+			["list"],
+			["html", { outputFolder: process.env.PLAYWRIGHT_HTML_REPORT_DIR || "reports/playwright-report", open: "never" }],
+		]
 		: [
-				["line"],
-				[
-					"html",
-					{ outputFolder: process.env.PLAYWRIGHT_HTML_REPORT_DIR || "reports/playwright-report", open: "never" },
-				],
-			],
+			["html", { outputFolder: process.env.PLAYWRIGHT_HTML_REPORT_DIR || "reports/playwright-report", open: "never" }],
+		],
 
 	use: {
 		viewport: { width: 1280, height: 720 },
-		actionTimeout: 15000,
-		navigationTimeout: 30000,
 		screenshot: "only-on-failure",
-		trace: "retain-on-failure",
-		video: "retain-on-failure",
+		trace: process.env.CI ? "on-first-retry" : "retain-on-failure",
+		video: process.env.CI ? "on-first-retry" : "retain-on-failure",
 		testIdAttribute: "data-test-id",
 	},
 
@@ -68,7 +59,7 @@ export default defineConfig({
 		/*
 		{
 			name: "chromium",
-			testMatch: /.*ui\/.*\.spec\.ts/,
+			testMatch: /.*e2e\/.*\.spec\.ts/,
 			use: {
 				...devices["Desktop Chrome"],
 			},
@@ -78,7 +69,7 @@ export default defineConfig({
 		// ── Firefox
 		{
 			name: "firefox",
-			testMatch: /.*ui\/.*\.spec\.ts/,
+			testMatch: /.*e2e\/.*\.spec\.ts/,
 			use: {
 				...devices["Desktop Firefox"],
 			},
@@ -87,7 +78,7 @@ export default defineConfig({
 		// ── WebKit (Safari)
 		{
 			name: "webkit",
-			testMatch: /.*ui\/.*\.spec\.ts/,
+			testMatch: /.*e2e\/.*\.spec\.ts/,
 			use: {
 				...devices["Desktop Safari"],
 			},
