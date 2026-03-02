@@ -23,11 +23,11 @@ test.describe(
 				let selectedProductTitle = "";
 				let listingPrice = "";
 
-				await test.step("Ana sayfayı aç ve 'iphone' ara", async () => {
+				await test.step("Navigate to homepage and search for 'iphone'", async () => {
 					await homePage.header.search(HB_DATA.SEARCH_TERM);
 				});
 
-				await test.step("Arama listesinden rastgele bir ürün seç ve listing fiyatını al", async () => {
+				await test.step("Select a random product from search results and capture listing price", async () => {
 					const result = await searchPage.selectRandomProduct();
 					selectedProductTitle = result.title;
 					listingPrice = result.price;
@@ -36,7 +36,7 @@ test.describe(
 					await expect(homePage.page).toHaveURL(/hepsiburada\.com\/.*-p(m)?-/i, { timeout: 10000 });
 				});
 
-				await test.step("Ürün detay sayfasını doğrula (başlık eşleşmesi)", async () => {
+				await test.step("Verify product detail page opens successfully", async () => {
 					const partialKey = selectedProductTitle.split(" ").slice(0, 3).join(" ");
 
 					await expect(
@@ -45,7 +45,7 @@ test.describe(
 					).toContainText(partialKey);
 				});
 
-				await test.step("Listing fiyatı ile detay sayfası fiyatı eşleşiyor mu?", async () => {
+				await test.step("Verify that detail page price matches listing price", async () => {
 					const detailPrice = await productDetailPage.getMainPrice();
 					if (!listingPrice || !detailPrice) {
 						return;
@@ -56,7 +56,7 @@ test.describe(
 						.toBe(listingPrice);
 				});
 
-				await test.step("Diğer satıcıları fiyatlarla karşılaştır", async () => {
+				await test.step("Compare prices with other sellers and select the cheapest option", async () => {
 					const otherSellersCount = await productDetailPage.getOtherSellersCount();
 
 					if (otherSellersCount > 0) {
@@ -71,7 +71,7 @@ test.describe(
 					}
 				});
 
-				await test.step("Sepete ekle", async () => {
+				await test.step("Add the selected product to cart", async () => {
 					await expect(productDetailPage.getAddToCartButtonLocator()).toBeEnabled({ timeout: TIMEOUTS.LARGE });
 					await productDetailPage.addToCart();
 				});

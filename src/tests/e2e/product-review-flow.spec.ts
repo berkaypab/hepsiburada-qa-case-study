@@ -21,11 +21,11 @@ test.describe(
 				let selectedProductTitle = "";
 				let listingPrice = "";
 
-				await test.step("Search for a product", async () => {
+				await test.step("Navigate to homepage and search for a product", async () => {
 					await homePage.header.search(HB_DATA.SEARCH_TERM);
 				});
 
-				await test.step("Collect product list into array and select a random product", async () => {
+				await test.step("Select a random product from search results and capture listing price", async () => {
 					const result = await searchPage.selectRandomProduct();
 					selectedProductTitle = result.title;
 					listingPrice = result.price;
@@ -34,7 +34,7 @@ test.describe(
 					await expect(homePage.page).toHaveURL(/hepsiburada\.com\/.*-p(m)?-/i, { timeout: 10000 });
 				});
 
-				await test.step("Verify detail page product matches the selected listing product", async () => {
+				await test.step("Verify product detail page opens successfully", async () => {
 					const partialKey = selectedProductTitle.split(" ").slice(0, 3).join(" ");
 
 					await expect(
@@ -43,7 +43,7 @@ test.describe(
 					).toContainText(partialKey, { ignoreCase: true });
 				});
 
-				await test.step("Listing fiyatı ile detay sayfası fiyatı eşleşiyor mu?", async () => {
+				await test.step("Verify that detail page price matches listing price", async () => {
 					const detailPrice = await productDetailPage.getMainPrice();
 					if (!listingPrice || !detailPrice) {
 						return;
@@ -69,7 +69,7 @@ test.describe(
 					await reviewsPage.sortByNewest();
 				});
 
-				await test.step("Click thumbsUp and verify thank you message", async () => {
+				await test.step("Vote helpful on a review and verify thank you message", async () => {
 					await expect(async () => {
 						await reviewsPage.clickThumbsUp();
 						await expect(reviewsPage.getThankYouMessageLocator()).toBeVisible({ timeout: TIMEOUTS.MEDIUM });
