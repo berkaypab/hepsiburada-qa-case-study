@@ -37,9 +37,11 @@ export default defineConfig({
 		? [
 			["list"],
 			["html", { outputFolder: process.env.PLAYWRIGHT_HTML_REPORT_DIR || "reports/playwright-report", open: "never" }],
+			["./src/shared/utils/custom-reporter.ts"],
 		]
 		: [
 			["html", { outputFolder: process.env.PLAYWRIGHT_HTML_REPORT_DIR || "reports/playwright-report", open: "never" }],
+			["./src/shared/utils/custom-reporter.ts"],
 		],
 
 	use: {
