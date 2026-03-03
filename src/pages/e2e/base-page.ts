@@ -19,12 +19,22 @@ export class BasePage {
 	}
 
 	async getRandomLocator(locatorList: Locator, maxLimit?: number): Promise<Locator> {
+		// Wait for at least one element in the list to be attached and visible
 		await locatorList.first().waitFor({ state: "visible", timeout: TIMEOUTS.XXLARGE });
-		const count = await locatorList.count();
-		if (count === 0) throw new Error("No items found in the list to select randomly.");
 
+		const count = await locatorList.count();
+		if (count === 0) {
+			throw new Error("No items found in the list to select randomly.");
+		}
+
+		// Apply limit if provided (e.g. only select from top 5 results)
 		const limit = maxLimit ? Math.min(count, maxLimit) : count;
 		const randomIndex = Math.floor(Math.random() * limit);
-		return locatorList.nth(randomIndex);
+
+		const selectedLocator = locatorList.nth(randomIndex);
+
+		// Ensure the selected individual locator is also ready for interaction
+		await selectedLocator.scrollIntoViewIfNeeded();
+		return selectedLocator;
 	}
 }
