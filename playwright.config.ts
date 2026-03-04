@@ -69,7 +69,7 @@ export default defineConfig({
 			name: "api",
 			testMatch: /.*api\/.*\.spec\.ts/,
 			use: {
-				baseURL: process.env.SWAGGER_API_BASE_URL,
+				baseURL: "https://generator.swagger.io",
 			},
 			dependencies: ["setup"],
 		},

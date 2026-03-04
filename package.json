@@ -25,6 +25,8 @@
 		"@types/node": "^24.0.3",
 		"@typescript-eslint/eslint-plugin": "^8.29.1",
 		"@typescript-eslint/parser": "^8.29.1",
+		"ajv": "^8.18.0",
+		"ajv-formats": "^3.0.1",
 		"eslint": "^9.24.0",
 		"eslint-config-prettier": "^10.1.1",
 		"eslint-plugin-prettier": "^5.2.6",

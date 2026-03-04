@@ -24,6 +24,7 @@
 		},
 		"outDir": "./dist",
 		"esModuleInterop": true,
+		"resolveJsonModule": true,
 		"forceConsistentCasingInFileNames": true,
 		"strict": true,
 		"declaration": false, // No need to generate declaration files (.d.ts) for a test project
