@@ -1,13 +1,13 @@
 {
 	"compilerOptions": {
-		"module": "commonjs",
-		"target": "ES2022",
+		"module": "ESNext",
+		"target": "ESNext",
 		"lib": [
-			"ES2022",
+			"ESNext",
 			"DOM"
 		],
 		"sourceMap": true,
-		"moduleResolution": "node",
+		"moduleResolution": "Bundler",
 		"importHelpers": true,
 		"skipLibCheck": true,
 		"noUnusedLocals": true,
@@ -31,7 +31,11 @@
 		"downlevelIteration": true, // Enables support for iterating on objects like `Map` and `Set` in older environments
 		"experimentalDecorators": true, // Enables experimental support for ES decorators
 		"noImplicitOverride": true, // Ensures that overriding methods in a subclass are marked with the 'override' keyword
-		"noImplicitReturns": true // Ensures that all code paths in a function explicitly return a value
+		"noImplicitReturns": true, // Ensures that all code paths in a function explicitly return a value
+		"types": [
+			"@playwright/test",
+			"node"
+		]
 	},
 	"include": [
 		"**/*.ts",
