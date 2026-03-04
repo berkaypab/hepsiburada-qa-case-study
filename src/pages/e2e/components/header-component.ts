@@ -19,19 +19,23 @@ export class HeaderComponent {
 			const activeSearchInput = this.page.getByPlaceholder(/Ürün, kategori veya marka ara/i).last();
 			await activeSearchInput.waitFor({ state: "visible", timeout: 5000 });
 
-			// 3. Clear and type. 
+			// 3. Clear and Type with a safe delay. 
+			// Character drops happen when automation types faster than JS hydration.
 			await activeSearchInput.clear();
-			await activeSearchInput.pressSequentially(term, { delay: 30 });
+			await activeSearchInput.pressSequentially(term, { delay: 50 });
 
-			// 4. Trigger search via Enter key
+			// 4. VERIFY: Confirm the term was typed correctly before proceeding.
+			// If characters are dropped, this assertion will fail and trigger a toPass() retry.
+			await expect(activeSearchInput).toHaveValue(term, { timeout: 3000 });
+
+			// 5. Trigger search via Enter key
 			await activeSearchInput.press("Enter");
 
-			// 5. Verify navigation to the results page
-			// If this fails, toPass will retry the whole block from step 1.
+			// 6. Verify navigation to the results page
 			await expect(this.page).toHaveURL(/(\/ara\?q=|s\?k=)/, { timeout: 7000 });
 		}).toPass({
 			intervals: [1000, 2000],
-			timeout: 20000
+			timeout: 25000
 		});
 	}
 }
