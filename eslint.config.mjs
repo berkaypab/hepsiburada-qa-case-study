@@ -3,8 +3,18 @@ import tseslint from "@typescript-eslint/eslint-plugin";
 import tsparser from "@typescript-eslint/parser";
 import prettierPlugin from "eslint-plugin-prettier";
 import prettierConfig from "eslint-config-prettier";
+import pluginPlaywright from "eslint-plugin-playwright";
 
 export default [
+	{
+		files: ["**/*.spec.ts", "**/*.setup.ts"],
+		...pluginPlaywright.configs["flat/recommended"],
+		rules: {
+			...pluginPlaywright.configs["flat/recommended"].rules,
+			"playwright/no-commented-out-tests": "error",
+			"playwright/no-duplicate-hooks": "error",
+		},
+	},
 	{
 		files: ["**/*.ts"],
 		ignores: ["node_modules/**", "test-results/**", "playwright-report/**", "./vs/**"],

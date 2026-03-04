@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { SwaggerController } from "../../api/controllers/SwaggerController";
 import { validateSchema } from "../../api/utils/schema-validator";
-import * as swaggerSchema from "../../api/schemas/swagger-generate.schema.json";
+import swaggerSchema from "../../api/schemas/swagger-generate.schema.json" with { type: "json" };
 
 test.describe("Study Case - Swagger Generator API", () => {
     let swaggerController: SwaggerController;
