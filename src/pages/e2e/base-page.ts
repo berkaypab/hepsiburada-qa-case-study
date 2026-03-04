@@ -3,7 +3,7 @@ import { HeaderComponent } from "./components/header-component";
 import { FooterComponent } from "./components/footer-component";
 import { TIMEOUTS } from "@utils/configuration";
 
-export class BasePage {
+export abstract class BasePage {
 	readonly page: Page;
 	public readonly header: HeaderComponent;
 	public readonly footer: FooterComponent;
