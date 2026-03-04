@@ -17,49 +17,9 @@ test.describe(
 				tag: [TAGS.REGRESSION, TAGS.CUSTOMER],
 				annotation: { type: "scenario", description: "S1: Search→Detail→Reviews→ThumbsUp" },
 			},
-			async ({ homePage, searchPage, productDetailPage, reviewsPage }) => {
-				let pdp: typeof productDetailPage;
-				let reviews: typeof reviewsPage;
-				let selectedProductTitle = "";
-				let listingPrice = "";
+			async ({ productSetup }) => {
+				const { pdp, reviews } = await productSetup(HB_DATA.SEARCH_TERM);
 
-				await test.step("Navigate to homepage and search for a product", async () => {
-					await homePage.header.search(HB_DATA.SEARCH_TERM);
-				});
-
-				await test.step("Select a random product from search results and capture listing price", async () => {
-					const result = await searchPage.selectRandomProduct();
-					selectedProductTitle = result.title;
-					listingPrice = result.price;
-
-					// Re-initialize POMs for the NEW tab
-					const newPage = result.newPage;
-					pdp = new (productDetailPage.constructor as any)(newPage);
-					reviews = new (reviewsPage.constructor as any)(newPage);
-
-					// PageAssertions: check if product detail page is reached (URL validation) on the NEW page
-					await expect(newPage).toHaveURL(/hepsiburada\.com\/.*-p(m)?-/i, { timeout: 10000 });
-				});
-
-				await test.step("Verify product detail page opens successfully", async () => {
-					const partialKey = selectedProductTitle.split(" ").slice(0, 3).join(" ");
-
-					await expect(
-						pdp.productTitleLocator,
-						`Page title does not contain the expected words: "${partialKey}"`,
-					).toContainText(partialKey, { ignoreCase: true });
-				});
-
-				await test.step("Verify that detail page price matches listing price", async () => {
-					const detailPrice = await pdp.getMainPrice();
-					if (!listingPrice || !detailPrice) {
-						return;
-					}
-
-					expect
-						.soft(detailPrice, `Listing (${listingPrice} TL) ↔ Detail (${detailPrice} TL) prices do not match`)
-						.toBe(listingPrice);
-				});
 
 				await test.step("Navigate to Reviews tab and sort by newest", async () => {
 					await pdp.clickReviewsTab();
