@@ -20,6 +20,7 @@ test.describe(
 				},
 			},
 			async ({ homePage, searchPage, productDetailPage }) => {
+				let pdp: typeof productDetailPage;
 				let selectedProductTitle = "";
 				let listingPrice = "";
 
@@ -31,22 +32,26 @@ test.describe(
 					const result = await searchPage.selectRandomProduct();
 					selectedProductTitle = result.title;
 					listingPrice = result.price;
-					// PageAssertions: check if product detail page is reached (URL validation)
-					// Hepsiburada URLs may contain "-p-" or "-pm-"
-					await expect(homePage.page).toHaveURL(/hepsiburada\.com\/.*-p(m)?-/i, { timeout: 10000 });
+
+					// Re-initialize pdp for the NEW tab
+					const newPage = result.newPage;
+					pdp = new (productDetailPage.constructor as any)(newPage);
+
+					// PageAssertions: check if product detail page is reached (URL validation) on the NEW page
+					await expect(newPage).toHaveURL(/hepsiburada\.com\/.*-p(m)?-/i, { timeout: 10000 });
 				});
 
 				await test.step("Verify product detail page opens successfully", async () => {
 					const partialKey = selectedProductTitle.split(" ").slice(0, 3).join(" ");
 
 					await expect(
-						productDetailPage.productTitleLocator,
+						pdp.productTitleLocator,
 						`Page title does not contain the expected words: "${partialKey}"`,
 					).toContainText(partialKey);
 				});
 
 				await test.step("Verify that detail page price matches listing price", async () => {
-					const detailPrice = await productDetailPage.getMainPrice();
+					const detailPrice = await pdp.getMainPrice();
 					if (!listingPrice || !detailPrice) {
 						return;
 					}
@@ -57,23 +62,23 @@ test.describe(
 				});
 
 				await test.step("Compare prices with other sellers and select the cheapest option", async () => {
-					const otherSellersCount = await productDetailPage.getOtherSellersCount();
+					const otherSellersCount = await pdp.getOtherSellersCount();
 
 					if (otherSellersCount > 0) {
-						const mainPrice = await productDetailPage.getMainPrice();
+						const mainPrice = await pdp.getMainPrice();
 						if (!mainPrice) return;
 
-						const cheapestIdx = await productDetailPage.getCheapestOtherSellerIndex(mainPrice);
+						const cheapestIdx = await pdp.getCheapestOtherSellerIndex(mainPrice);
 
 						if (cheapestIdx !== -1) {
-							await productDetailPage.navigateToOtherSeller(cheapestIdx);
+							await pdp.navigateToOtherSeller(cheapestIdx);
 						}
 					}
 				});
 
 				await test.step("Add the selected product to cart", async () => {
-					await expect(productDetailPage.getAddToCartButtonLocator()).toBeEnabled({ timeout: TIMEOUTS.LARGE });
-					await productDetailPage.addToCart();
+					await expect(pdp.getAddToCartButtonLocator()).toBeEnabled({ timeout: TIMEOUTS.LARGE });
+					await pdp.addToCart();
 				});
 			},
 		);

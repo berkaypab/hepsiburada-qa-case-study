@@ -14,8 +14,12 @@ export const test = base.extend<PagesFixture>({
 		if (!baseUrl) throw new Error("HB_BASE_URL environment variable is missing!");
 
 		// Layer 1 — context.route() (Playwright Fixtures API: context)
-		// page.route() only covers the current tab; context.route() covers all tabs
-		// Consent intercept remains valid even if new tabs (popup, other sellers, etc.) are opened
+		// Global Network Interception: Block ads, trackers, and telemetry to speed up tests
+		// Using regex for common patterns found in Hepsiburada (Google Analytics, Insider, Hotjar, etc.)
+		await context.route(/google-analytics|googletagmanager|hotjar|insider|facebook|doubleclick|segment/, async (route) => {
+			await route.abort();
+		});
+
 		await context.route("**/consent/**", async (route) => {
 			await route.continue();
 		});

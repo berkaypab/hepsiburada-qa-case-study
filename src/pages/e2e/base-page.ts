@@ -31,10 +31,6 @@ export class BasePage {
 		const limit = maxLimit ? Math.min(count, maxLimit) : count;
 		const randomIndex = Math.floor(Math.random() * limit);
 
-		const selectedLocator = locatorList.nth(randomIndex);
-
-		// Ensure the selected individual locator is also ready for interaction
-		await selectedLocator.scrollIntoViewIfNeeded();
-		return selectedLocator;
+		return locatorList.nth(randomIndex);
 	}
 }

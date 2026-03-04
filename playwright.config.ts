@@ -86,7 +86,7 @@ export default defineConfig({
 
 		// ── Native Google Chrome (Branded)
 		{
-			name: "Google Chrome",
+			name: "chrome",
 			testMatch: /.*e2e\/.*\.spec\.ts/,
 			use: {
 				...devices["Desktop Chrome"],

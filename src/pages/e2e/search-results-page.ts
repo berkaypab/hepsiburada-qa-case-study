@@ -29,7 +29,8 @@ export class ProductCardComponent {
 	}
 
 	async getTitle(): Promise<string> {
-		return (await this.title.textContent())?.trim() ?? "";
+		const titleText = await this.title.innerText();
+		return titleText.trim();
 	}
 
 	async getHref(): Promise<string> {
@@ -37,11 +38,8 @@ export class ProductCardComponent {
 	}
 
 	async getPrice(): Promise<string> {
-		if (await this.price.isVisible()) {
-			const priceText = (await this.price.textContent())?.trim() ?? "";
-			return formatPriceString(priceText);
-		}
-		return "";
+		const priceText = await this.price.innerText();
+		return formatPriceString(priceText.trim());
 	}
 }
 
@@ -53,15 +51,23 @@ export class SearchResultsPage extends BasePage {
 		this.productListItems = this.page.locator("li").filter({ has: this.page.locator('[data-test-id^="title-"]') });
 	}
 
-	async selectRandomProduct(): Promise<{ title: string; price: string }> {
-		const { title, href, price } = await this.findValidProductCard();
-		await this.navigateToProduct(href);
+	async selectRandomProduct(): Promise<{ title: string; price: string; newPage: Page }> {
+		const { title, price, link } = await this.findValidProductCard();
 
-		return { title, price };
+		// Multi-Tab Handling: Capture the new tab that opens when clicking a product
+		// We use Promise.all to avoid race conditions between the click and the event listener
+		const [newPage] = await Promise.all([
+			this.page.context().waitForEvent("page"),
+			link.click()
+		]);
+
+		await newPage.waitForLoadState("domcontentloaded");
+
+		return { title, price, newPage };
 	}
 
-	private async findValidProductCard(): Promise<{ title: string; href: string; price: string }> {
-		let validData: { title: string; href: string; price: string } | undefined;
+	private async findValidProductCard(): Promise<{ title: string; price: string; link: Locator }> {
+		let validData: { title: string; price: string; link: Locator } | undefined;
 
 		await this.productListItems.first().waitFor({ state: "visible", timeout: 30000 });
 
@@ -70,12 +76,11 @@ export class SearchResultsPage extends BasePage {
 			const productCard = new ProductCardComponent(cardLocator);
 			validData = {
 				title: await productCard.getTitle(),
-				href: await productCard.getHref(),
 				price: await productCard.getPrice(),
+				link: productCard.link
 			};
 
 			expect(validData.title).toBeTruthy();
-			expect(validData.href).toBeTruthy();
 			expect(validData.price).toBeTruthy();
 		}).toPass({ timeout: 15000, intervals: [500, 1000] });
 
@@ -83,10 +88,5 @@ export class SearchResultsPage extends BasePage {
 		return validData;
 	}
 
-	private async navigateToProduct(href: string): Promise<void> {
-		const baseUrl = process.env.HB_BASE_URL;
-		const finalUrl = href.startsWith("http") ? href : `${baseUrl}${href}`;
 
-		await this.page.goto(finalUrl, { waitUntil: "domcontentloaded" });
-	}
 }

@@ -8,7 +8,7 @@ test.describe("Swagger Generator API Tests", () => {
 		swaggerApi = new SwaggerGeneratorApi(request);
 	});
 
-	test("Should generate a client and download it using the extracted code (Best Practice)", async () => {
+	test("Should generate a client and download it using the extracted code", async () => {
 		let downloadCode = "";
 
 		await test.step("Step 1: Send the POST request to generate a JavaScript client", async () => {

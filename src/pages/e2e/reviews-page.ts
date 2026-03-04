@@ -15,7 +15,11 @@ export class ReviewsPage extends BasePage {
 	constructor(page: Page) {
 		super(page);
 		this.sortNewestOption = this.page.getByText(TEXT_CONSTANTS.SORT_NEWEST_REGEX);
-		this.thumbsUpButton = this.page.locator("[class*='thumbsUp']").first();
+		// Role-based logic failed because it's a generic div. 
+		// Best practice: Anchor to the visible text section and use a descriptive sub-locator.
+		this.thumbsUpButton = this.page.locator("div")
+			.filter({ hasText: "Bu değerlendirme faydalı mı?" })
+			.locator(".thumbsUp").first();
 		this.thankYouMessage = this.page.getByText(TEXT_CONSTANTS.THANK_YOU_MSG, { exact: true }).first();
 	}
 
@@ -52,9 +56,7 @@ export class ReviewsPage extends BasePage {
 	}
 
 	async clickThumbsUp(): Promise<void> {
-		// Scroll into viewport -> triggers intersection observer for rendering
-		await this.thumbsUpButton.scrollIntoViewIfNeeded();
-		await this.thumbsUpButton.waitFor({ state: "visible", timeout: TIMEOUTS.LARGE });
+		// click() already handles auto-scrolling and actionability checks
 		await this.thumbsUpButton.click();
 	}
 

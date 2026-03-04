@@ -1,6 +1,5 @@
 import { Page, Locator } from "@playwright/test";
 import { BasePage } from "./base-page";
-import { TIMEOUTS } from "@utils/configuration";
 import { formatPriceString } from "shared/utils";
 
 export class OtherSellerComponent {
@@ -15,15 +14,11 @@ export class OtherSellerComponent {
 	}
 
 	async getPriceText(): Promise<string> {
-		if (await this.price.isVisible()) {
-			const priceText = (await this.price.textContent())?.trim() ?? "";
-			return formatPriceString(priceText);
-		}
-		return "";
+		const priceText = await this.price.innerText();
+		return formatPriceString(priceText.trim());
 	}
 
 	async clickActionButton(): Promise<void> {
-		await this.actionButton.scrollIntoViewIfNeeded();
 		await this.actionButton.click();
 	}
 }
@@ -42,14 +37,14 @@ export class ProductDetailPage extends BasePage {
 	constructor(page: Page) {
 		super(page);
 
-		this.productTitleLocator = page.getByTestId("title").first();
+		this.productTitleLocator = page.getByRole("heading", { level: 1 }).first();
 
 		const defaultPriceLoc = page.getByTestId("default-price").locator("span").first();
 		const checkoutPriceLoc = page.getByTestId("checkout-price").locator("div").filter({ hasText: /TL/i }).first();
 
 		this.mainPriceEl = defaultPriceLoc.or(checkoutPriceLoc);
 
-		this.addToCartButton = page.getByTestId("addToCart").first();
+		this.addToCartButton = page.getByRole("button", { name: /Sepete Ekle/i }).first();
 
 		this.otherSellersSection = page.getByTestId("other-merchants").first();
 
@@ -58,20 +53,18 @@ export class ProductDetailPage extends BasePage {
 	}
 
 	async getMainPrice(): Promise<string> {
-		const raw = (await this.mainPriceEl.textContent())?.trim() ?? "";
-		return formatPriceString(raw);
+		const raw = await this.mainPriceEl.innerText();
+		return formatPriceString(raw.trim());
 	}
 
 	async clickReviewsTab(): Promise<void> {
-		const cleanUrl = this.page
-			.url()
-			.split("?")[0]
-			.replace(/-yorumlari$/, "");
-		const targetUrl = `${cleanUrl}-yorumlari`;
+		// UI-Driven Navigation: Click the reviews link/tab instead of modifying URL
+		// Using the locator provided in the HTML snippet
+		const reviewsLink = this.page.getByTestId("has-review").getByRole("link").first();
 
-		// 'commit' -> resolves Firefox NS_BINDING_ABORTED issue (Playwright GitHub #20749)
-		// Resolves as soon as the HTML stream starts, before Firefox aborts the connection
-		await this.page.goto(targetUrl, { waitUntil: "commit", timeout: TIMEOUTS.LARGE });
+		await reviewsLink.click();
+
+		// Wait for the reviews page to stabilize
 		await this.page.waitForLoadState("domcontentloaded");
 	}
 
@@ -106,7 +99,6 @@ export class ProductDetailPage extends BasePage {
 	}
 
 	async addToCart(): Promise<void> {
-		await this.addToCartButton.scrollIntoViewIfNeeded();
 		await this.addToCartButton.click();
 	}
 
