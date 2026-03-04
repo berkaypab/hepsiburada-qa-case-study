@@ -33,7 +33,7 @@ test.describe(
 						return;
 					}
 
-					await reviews.sortByNewest();
+						await reviews.sortByNewest();
 				});
 
 				await test.step("Vote helpful on a review and verify thank you message", async () => {

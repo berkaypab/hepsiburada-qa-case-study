@@ -8,8 +8,8 @@ export class HeaderComponent {
 	}
 
 	async search(term: string): Promise<void> {
-		// We use toPass to retry the entire interaction sequence. 
-		// This handles "Hydration" issues where the Enter key might be ignored if the page 
+		// We use toPass to retry the entire interaction sequence.
+		// This handles "Hydration" issues where the Enter key might be ignored if the page
 		// hasn't finished attaching JS listeners to the search input.
 		await expect(async () => {
 			// 1. Click the search wrapper to trigger the modal/overlay
@@ -19,7 +19,7 @@ export class HeaderComponent {
 			const activeSearchInput = this.page.getByPlaceholder(/Ürün, kategori veya marka ara/i).last();
 			await activeSearchInput.waitFor({ state: "visible", timeout: 5000 });
 
-			// 3. Clear and Type with a safe delay. 
+			// 3. Clear and Type with a safe delay.
 			// Character drops happen when automation types faster than JS hydration.
 			await activeSearchInput.clear();
 			await activeSearchInput.pressSequentially(term, { delay: 50 });
@@ -35,7 +35,7 @@ export class HeaderComponent {
 			await expect(this.page).toHaveURL(/(\/ara\?q=|s\?k=)/, { timeout: 7000 });
 		}).toPass({
 			intervals: [1000, 2000],
-			timeout: 25000
+			timeout: 25000,
 		});
 	}
 }

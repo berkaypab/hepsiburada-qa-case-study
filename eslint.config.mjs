@@ -13,6 +13,8 @@ export default [
 			...pluginPlaywright.configs["flat/recommended"].rules,
 			"playwright/no-commented-out-tests": "error",
 			"playwright/no-duplicate-hooks": "error",
+			"playwright/no-conditional-in-test": "warn",
+			"playwright/no-skipped-test": "warn",
 		},
 	},
 	{

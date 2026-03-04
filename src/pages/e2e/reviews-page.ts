@@ -15,11 +15,13 @@ export class ReviewsPage extends BasePage {
 	constructor(page: Page) {
 		super(page);
 		this.sortNewestOption = this.page.getByText(TEXT_CONSTANTS.SORT_NEWEST_REGEX);
-		// Role-based logic failed because it's a generic div. 
+		// Role-based logic failed because it's a generic div.
 		// Best practice: Anchor to the visible text section and use a descriptive sub-locator.
-		this.thumbsUpButton = this.page.locator("div")
+		this.thumbsUpButton = this.page
+			.locator("div")
 			.filter({ hasText: "Bu değerlendirme faydalı mı?" })
-			.locator(".thumbsUp").first();
+			.locator(".thumbsUp")
+			.first();
 		this.thankYouMessage = this.page.getByText(TEXT_CONSTANTS.THANK_YOU_MSG, { exact: true }).first();
 	}
 
@@ -48,11 +50,9 @@ export class ReviewsPage extends BasePage {
 
 		// Wait until thumbs-up buttons render after sorting
 		// Only TimeoutError is suppressed — other errors are re-thrown (playwright.errors API)
-		await this.thumbsUpButton
-			.waitFor({ state: "visible", timeout: TIMEOUTS.LARGE })
-			.catch((e: unknown) => {
-				if (!(e instanceof errors.TimeoutError)) throw e;
-			});
+		await this.thumbsUpButton.waitFor({ state: "visible", timeout: TIMEOUTS.LARGE }).catch((e: unknown) => {
+			if (!(e instanceof errors.TimeoutError)) throw e;
+		});
 	}
 
 	async clickThumbsUp(): Promise<void> {

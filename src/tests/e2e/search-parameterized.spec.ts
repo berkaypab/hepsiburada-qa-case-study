@@ -1,0 +1,51 @@
+import { test, expect } from "./fixtures/pages-fixture";
+import { TAGS, TIMEOUTS } from "@utils/configuration";
+
+const searchData = [
+    { keyword: "iphone", expectedUrlPattern: /q=iphone/i },
+    { keyword: "samsung", expectedUrlPattern: /q=samsung/i },
+    { keyword: "macbook", expectedUrlPattern: /q=macbook/i },
+];
+
+test.describe(
+    "Hepsiburada — Parameterize Search Scenarios",
+    {
+        annotation: {
+            type: "feature",
+            description: "Scenario-Parameterize: testing search functionality with multiple keywords",
+        },
+    },
+    () => {
+        for (const data of searchData) {
+            test(
+                `Should successfully search for "${data.keyword}"`,
+                {
+                    tag: [TAGS.REGRESSION, TAGS.CUSTOMER],
+                    annotation: {
+                        type: "scenario",
+                        description: `Searching functionality parameterized with: ${data.keyword}`,
+                    },
+                },
+                async ({ homePage, page }) => {
+                    await test.step(`Search for keyword: ${data.keyword}`, async () => {
+                        await homePage.header.search(data.keyword);
+                    });
+
+                    await test.step(`Verify URL contains the searched keyword: ${data.keyword}`, async () => {
+                        // URL should be updated to contain the searched term
+                        await expect(page).toHaveURL(data.expectedUrlPattern, { timeout: TIMEOUTS.LARGE });
+                    });
+
+                    await test.step(`Verify result items are loaded`, async () => {
+                        // Using the search results page items locator logically
+                        const resultsList = page.locator("li").filter({ has: page.locator('[data-test-id^="title-"]') });
+                        await expect(resultsList.first()).toBeVisible({ timeout: TIMEOUTS.XXLARGE });
+
+                        const count = await resultsList.count();
+                        expect(count).toBeGreaterThan(0);
+                    });
+                },
+            );
+        }
+    },
+);

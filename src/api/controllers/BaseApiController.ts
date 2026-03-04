@@ -1,24 +1,32 @@
 import { APIRequestContext, APIResponse } from "@playwright/test";
 
 export abstract class BaseApiController {
-    protected readonly request: APIRequestContext;
+	protected readonly request: APIRequestContext;
 
-    constructor(request: APIRequestContext) {
-        this.request = request;
-    }
+	constructor(request: APIRequestContext) {
+		this.request = request;
+	}
 
-    /**
-     * Standardized request execution with logging
-     */
-    protected async executeRequest(
-        method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
-        url: string,
-        options?: any
-    ): Promise<APIResponse> {
-        const unboundMethod = this.request[method.toLowerCase() as keyof APIRequestContext];
-        if (typeof unboundMethod !== 'function') {
-            throw new Error(`Method ${method} is not supported on APIRequestContext`);
-        }
-        return await (unboundMethod as Function).call(this.request, url, options);
-    }
+	protected async executeRequest(
+		method: "get" | "post" | "put" | "delete" | "patch" | "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
+		url: string,
+		options?: Parameters<APIRequestContext["get"]>[1],
+	): Promise<APIResponse> {
+		const lowerMethod = method.toLowerCase() as "get" | "post" | "put" | "delete" | "patch";
+
+		switch (lowerMethod) {
+			case "get":
+				return await this.request.get(url, options);
+			case "post":
+				return await this.request.post(url, options);
+			case "put":
+				return await this.request.put(url, options);
+			case "delete":
+				return await this.request.delete(url, options);
+			case "patch":
+				return await this.request.patch(url, options);
+			default:
+				throw new Error(`Method ${method} is not supported on APIRequestContext`);
+		}
+	}
 }

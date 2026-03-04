@@ -1,17 +1,14 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "object",
-    "required": [
-        "code",
-        "link"
-    ],
-    "properties": {
-        "code": {
-            "type": "string"
-        },
-        "link": {
-            "type": "string",
-            "format": "uri"
-        }
-    }
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"type": "object",
+	"required": ["code", "link"],
+	"properties": {
+		"code": {
+			"type": "string"
+		},
+		"link": {
+			"type": "string",
+			"format": "uri"
+		}
+	}
 }

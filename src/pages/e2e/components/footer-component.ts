@@ -4,7 +4,6 @@ import { TIMEOUTS } from "@utils/configuration";
 export class FooterComponent {
 	public readonly page: Page;
 
-
 	private readonly socialMediaLinks: Locator;
 	private readonly mobileAppLinks: Locator;
 
@@ -41,5 +40,4 @@ export class FooterComponent {
 		await appLink.waitFor({ state: "visible", timeout: TIMEOUTS.SMALL });
 		await appLink.click();
 	}
-
 }

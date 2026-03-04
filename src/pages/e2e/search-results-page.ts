@@ -17,15 +17,15 @@ export class ProductCardComponent {
 	constructor(container: Locator) {
 		this.container = container;
 
-		this.title = container.locator('[data-test-id^="title-"]').first();
+		this.title = container.locator('[data-test-id^="title-"]');
 		this.link = container.getByRole("link").first();
-		this.price = container.locator('[data-test-id^="final-price-"]').first();
-		this.badge = container.locator('[data-test-id^="badge-image-"]').first();
-		this.estimatedArrival = container.locator('[data-test-id^="ead-"]').first();
-		this.favoriteButton = container.locator('[data-test-id^="add-to-favorite-button-"]').first();
-		this.variantsCount = container.locator('[data-test-id^="variants-count-"]').first();
-		this.rating = container.locator('[data-test-id^="rating-"]').first();
-		this.addToCartButton = container.locator('[data-test-id^="add-to-cart-button-"]').first();
+		this.price = container.locator('[data-test-id^="final-price-"]');
+		this.badge = container.locator('[data-test-id^="badge-image-"]');
+		this.estimatedArrival = container.locator('[data-test-id^="ead-"]');
+		this.favoriteButton = container.locator('[data-test-id^="add-to-favorite-button-"]');
+		this.variantsCount = container.locator('[data-test-id^="variants-count-"]');
+		this.rating = container.locator('[data-test-id^="rating-"]');
+		this.addToCartButton = container.locator('[data-test-id^="add-to-cart-button-"]');
 	}
 
 	async getTitle(): Promise<string> {
@@ -61,7 +61,10 @@ export class SearchResultsPage extends BasePage {
 			link.click()
 		]);
 
-		await newPage.waitForLoadState("domcontentloaded");
+		// Wait for the PDP URL pattern instead of a generic loadState —
+		// more specific and aligns with Playwright's recommendation to
+		// await a concrete condition rather than a load event.
+		await newPage.waitForURL(/hepsiburada\.com\/.*-p(m)?-/i, { timeout: 15000 });
 
 		return { title, price, newPage };
 	}
@@ -74,14 +77,12 @@ export class SearchResultsPage extends BasePage {
 		await expect(async () => {
 			const cardLocator = await this.getRandomLocator(this.productListItems);
 			const productCard = new ProductCardComponent(cardLocator);
+
 			validData = {
 				title: await productCard.getTitle(),
 				price: await productCard.getPrice(),
 				link: productCard.link
 			};
-
-			expect(validData.title).toBeTruthy();
-			expect(validData.price).toBeTruthy();
 		}).toPass({ timeout: 15000, intervals: [500, 1000] });
 
 		if (!validData) throw new Error("No valid product card found.");

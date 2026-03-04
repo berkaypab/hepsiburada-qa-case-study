@@ -30,10 +30,10 @@ test.describe(
 						const mainPrice = await pdp.getMainPrice();
 						if (!mainPrice) return;
 
-						const cheapestIdx = await pdp.getCheapestOtherSellerIndex(mainPrice);
+							const cheapestIdx = await pdp.getCheapestOtherSellerIndex(mainPrice);
 
-						if (cheapestIdx !== -1) {
-							await pdp.navigateToOtherSeller(cheapestIdx);
+							if (cheapestIdx !== -1) {
+								await pdp.navigateToOtherSeller(cheapestIdx);
 						}
 					}
 				});
