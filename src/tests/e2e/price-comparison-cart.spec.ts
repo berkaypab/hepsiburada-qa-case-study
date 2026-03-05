@@ -4,7 +4,7 @@ import { TAGS, TIMEOUTS } from "@utils/configuration";
 
 /**
  * @fileoverview Scenario 2: Other Sellers Price Comparison
- * Verifies that a user can successfully search for a product, land on its PDP, 
+ * Verifies that a user can successfully search for a product, land on its PDP,
  * compare its price against other sellers in the buy-box, pick the cheapest one,
  * and add it to the cart.
  */

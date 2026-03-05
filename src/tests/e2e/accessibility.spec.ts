@@ -2,7 +2,13 @@ import { test, expect } from "./fixtures/pages-fixture";
 import AxeBuilder from "@axe-core/playwright";
 import { TAGS } from "@utils/configuration";
 
-test.describe.skip(
+/**
+ * @fileoverview Accessibility (a11y) Scenarios
+ * Runs axe-core scans on the Homepage, PDP, and Cart pages.
+ * Tagged @slow — excluded from the default `test:e2e` run.
+ * To run explicitly: npx playwright test --grep @slow
+ */
+test.describe(
 	"Accessibility (a11y) Scenarios",
 	{
 		annotation: {
@@ -14,7 +20,7 @@ test.describe.skip(
 		test(
 			"Key pages should not have any automatically detectable accessibility violations",
 			{
-				tag: [TAGS.REGRESSION, TAGS.CUSTOMER],
+				tag: [TAGS.REGRESSION, TAGS.CUSTOMER, "@slow"],
 			},
 			async ({ page, productSetup }) => {
 				// 1. Homepage Accessibility Scan

@@ -5,7 +5,7 @@ import { TAGS, TIMEOUTS } from "@utils/configuration";
 /**
  * @fileoverview Scenario 1: Product Review Test
  * Validates the core community interaction layer. Given a searched product,
- * navigates to the reviews section, handles dynamic "no reviews" states, 
+ * navigates to the reviews section, handles dynamic "no reviews" states,
  * and verifies that a user can successfully upvote a helpful review.
  */
 
@@ -29,12 +29,13 @@ test.describe(
 
 				await test.step("Navigate to Reviews tab and sort by newest", async () => {
 					await pdp.clickReviewsTab();
-					// Make sure we're on the reviews tab 
+					// Make sure we're on the reviews tab
 					await expect(pdp.page).toHaveURL(/-yorumlari$/, { timeout: 10000 });
 
 					const hasReviews = await reviews.hasReviews();
 
 					if (!hasReviews) {
+						// eslint-disable-next-line playwright/no-skipped-test -- runtime conditional skip, not a forgotten static skip
 						test.skip(true, "No reviews found on this product — skipping test.");
 						return;
 					}

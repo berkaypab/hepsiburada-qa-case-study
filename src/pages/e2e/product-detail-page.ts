@@ -75,7 +75,7 @@ export class ProductDetailPage extends BasePage {
 	/**
 	 * Iterates through all "Other Sellers" listed on the PDP.
 	 * Compares each seller's price against the provided main price.
-	 * 
+	 *
 	 * @param mainPrice - The price of the product sold by Hepsiburada/default seller.
 	 * @returns The zero-based index of the cheapest seller, or -1 if none are cheaper.
 	 */
@@ -110,7 +110,7 @@ export class ProductDetailPage extends BasePage {
 
 	/**
 	 * Discovers the "Add to Cart" button (waiting for dynamic visibility/delays) and clicks it.
-	 * Returns immediately after the click action. Wait for the confirmation toast 
+	 * Returns immediately after the click action. Wait for the confirmation toast
 	 * separately if needed.
 	 */
 	async addToCart(): Promise<void> {

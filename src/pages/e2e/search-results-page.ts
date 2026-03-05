@@ -54,7 +54,7 @@ export class SearchResultsPage extends BasePage {
 	/**
 	 * Scans the current search results and intelligently picks a product card.
 	 * Handles the new tab (target="_blank") behavior gracefully.
-	 * 
+	 *
 	 * @returns The extracted product title, price, and the newly opened Page object.
 	 */
 	async selectRandomProduct(): Promise<{ title: string; price: string; newPage: Page }> {

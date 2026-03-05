@@ -12,7 +12,7 @@ export class SwaggerController extends BaseApiController {
 
 	/** Returns the list of all supported server framework names. */
 	async getServerOptions(): Promise<APIResponse> {
-		return this.executeRequest("GET", `/api/gen/servers`);
+		return this.executeRequest("GET", "/api/gen/servers");
 	}
 
 	/**
@@ -37,7 +37,7 @@ export class SwaggerController extends BaseApiController {
 
 	/** Returns the list of all supported client language names. */
 	async getClientOptions(): Promise<APIResponse> {
-		return this.executeRequest("GET", `/api/gen/clients`);
+		return this.executeRequest("GET", "/api/gen/clients");
 	}
 
 	/**

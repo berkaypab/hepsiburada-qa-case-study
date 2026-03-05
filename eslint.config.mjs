@@ -46,4 +46,12 @@ export default [
 			"@typescript-eslint/no-misused-promises": "error",
 		},
 	},
+	// Custom reporter needs console.log to print to stdio — this is the documented
+	// Playwright reporter pattern (see: test-reporters-js.md). Disable no-console for this file only.
+	{
+		files: ["src/shared/utils/custom-reporter.ts"],
+		rules: {
+			"no-console": "off",
+		},
+	},
 ];

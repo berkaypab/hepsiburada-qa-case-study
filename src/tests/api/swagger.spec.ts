@@ -69,7 +69,7 @@ test.describe("Swagger Generator API", () => {
 		await test.step("Generate nodejs-server for Petstore API", async () => {
 			const response = await swaggerController.generateServer(
 				"nodejs-server",
-				"http://petstore.swagger.io/v2/swagger.json"
+				"http://petstore.swagger.io/v2/swagger.json",
 			);
 			expect(response.ok()).toBeTruthy();
 			const data = await response.json();
@@ -89,7 +89,7 @@ test.describe("Swagger Generator API", () => {
 						message: "API should return 200 when server archive is ready for download",
 						timeout: 20_000,
 						intervals: [2000, 5000],
-					}
+					},
 				)
 				.toBe(200);
 		});
