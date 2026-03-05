@@ -2,6 +2,13 @@ import { HB_DATA } from "../../shared/mock-data/hb-data";
 import { test, expect } from "./fixtures/pages-fixture";
 import { TAGS, TIMEOUTS } from "@utils/configuration";
 
+/**
+ * @fileoverview Scenario 1: Product Review Test
+ * Validates the core community interaction layer. Given a searched product,
+ * navigates to the reviews section, handles dynamic "no reviews" states, 
+ * and verifies that a user can successfully upvote a helpful review.
+ */
+
 test.describe(
 	"Hepsiburada — Scenario 1: Product Review Test",
 	{
@@ -22,7 +29,7 @@ test.describe(
 
 				await test.step("Navigate to Reviews tab and sort by newest", async () => {
 					await pdp.clickReviewsTab();
-					// PageAssertions: check if URL ends with '-yorumlari' (ReviewsTab navigation verification)
+					// Make sure we're on the reviews tab 
 					await expect(pdp.page).toHaveURL(/-yorumlari$/, { timeout: 10000 });
 
 					const hasReviews = await reviews.hasReviews();
@@ -35,7 +42,7 @@ test.describe(
 					await reviews.sortByNewest();
 				});
 
-				await test.step("Vote helpful on a review and verify thank you message", async () => {
+				await test.step("Thumbs up a review and wait for thank you message", async () => {
 					await expect(async () => {
 						await reviews.clickThumbsUp();
 						await expect(reviews.getThankYouMessageLocator()).toBeVisible({ timeout: TIMEOUTS.MEDIUM });

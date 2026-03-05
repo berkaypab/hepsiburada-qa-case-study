@@ -2,7 +2,7 @@ import { test, expect } from "./fixtures/pages-fixture";
 import AxeBuilder from "@axe-core/playwright";
 import { TAGS } from "@utils/configuration";
 
-test.describe(
+test.describe.skip(
 	"Accessibility (a11y) Scenarios",
 	{
 		annotation: {

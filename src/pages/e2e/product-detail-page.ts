@@ -72,20 +72,30 @@ export class ProductDetailPage extends BasePage {
 		return await this.otherSellersSection.count();
 	}
 
-	/** Compares the main product price with the visible top 2 other sellers and returns the cheapest seller's index (-1 = main product is cheapest). */
-	async getCheapestOtherSellerIndex(mainPrice: string): Promise<number> {
+	/**
+	 * Iterates through all "Other Sellers" listed on the PDP.
+	 * Compares each seller's price against the provided main price.
+	 * 
+	 * @param mainPrice - The price of the product sold by Hepsiburada/default seller.
+	 * @returns The zero-based index of the cheapest seller, or -1 if none are cheaper.
+	 */
+	async getCheapestOtherSellerIndex(mainPrice: number): Promise<number> {
 		const rowCount = await this.otherSellerRows.count();
 		if (rowCount === 0) return -1;
 
-		let cheapestPrice = mainPrice;
 		let cheapestIdx = -1;
+		let cheapestPrice = mainPrice;
 
-		for (let i = 0; i < Math.min(rowCount, 2); i++) {
+		const checks = Math.min(2, rowCount);
+
+		for (let i = 0; i < checks; i++) {
 			const seller = new OtherSellerComponent(this.otherSellerRows.nth(i));
-			const price = await seller.getPriceText();
+			const priceStr = await seller.getPriceText();
+			const price = parseFloat(priceStr.replace(/\./g, "").replace(",", "."));
+
 			if (price && price < cheapestPrice) {
-				cheapestPrice = price;
 				cheapestIdx = i;
+				cheapestPrice = price;
 			}
 		}
 
@@ -98,6 +108,11 @@ export class ProductDetailPage extends BasePage {
 		await sellerComponent.clickActionButton();
 	}
 
+	/**
+	 * Discovers the "Add to Cart" button (waiting for dynamic visibility/delays) and clicks it.
+	 * Returns immediately after the click action. Wait for the confirmation toast 
+	 * separately if needed.
+	 */
 	async addToCart(): Promise<void> {
 		await this.addToCartButton.click();
 	}

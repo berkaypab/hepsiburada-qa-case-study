@@ -6,7 +6,7 @@ import { test, expect } from "./fixtures/pages-fixture";
 test.describe("Verifying Homepage Sections", () => {
 	test("Verify main sections and products", async ({ page }) => {
 		// 1. Navigate to the homepage (https://www.hepsiburada.com/)
-		// (This step is automatically handled by the homePage fixture mounting the baseURL)
+		await page.goto("/");
 
 		// 2. Verify that the homepage search box is visible
 		await expect(page.getByPlaceholder(/Ürün, kategori veya marka ara/i).first()).toBeVisible({ timeout: 15000 });

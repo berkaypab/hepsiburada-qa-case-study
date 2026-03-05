@@ -66,16 +66,11 @@ export const test = base.extend<PagesFixture>({
 		await use(new CartPage(page));
 	},
 	/**
-	 * Granular product setup flow: each logical step is independently tracked.
+	 * Runs the full product browsing setup (search → pick product → verify price).
+	 * Each step is wrapped in `base.step()` so the HTML report shows exactly which step failed.
 	 *
-	 * Steps:
-	 *  1. Search for keyword
-	 *  2. Select a random product from results
-	 *  3. Verify PDP URL and title
-	 *  4. Verify price consistency (soft)
-	 *
-	 * Breaking the monolithic setup into granular steps makes the HTML report
-	 * pinpoint exactly which step failed instead of a generic "Product Setup" failure.
+	 * @param term - The keyword to search for (e.g. HB_DATA.SEARCH_TERM).
+	 * @returns Initialized POM objects and extracted title/price from the opened PDP tab.
 	 */
 	productSetup: [
 		async ({ homePage, searchPage }, use) => {

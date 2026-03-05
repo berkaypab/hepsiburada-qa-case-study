@@ -51,6 +51,12 @@ export class SearchResultsPage extends BasePage {
 		this.productListItems = this.page.locator("li").filter({ has: this.page.locator('[data-test-id^="title-"]') });
 	}
 
+	/**
+	 * Scans the current search results and intelligently picks a product card.
+	 * Handles the new tab (target="_blank") behavior gracefully.
+	 * 
+	 * @returns The extracted product title, price, and the newly opened Page object.
+	 */
 	async selectRandomProduct(): Promise<{ title: string; price: string; newPage: Page }> {
 		const { title, price, link } = await this.findValidProductCard();
 
@@ -97,7 +103,7 @@ export class SearchResultsPage extends BasePage {
 			await expect.soft(productCard.title, `Product ${i + 1} title should be visible`).toBeVisible();
 			await expect.soft(productCard.link, `Product ${i + 1} link should be visible`).toBeVisible();
 			// Note: Price isn't always available on all items (e.g., sponsored elements or special bundles),
-			// but if it's considered mandatory in the catalog, this is the perfect place for a soft assertion.
+			// but if it's considered mandatory in the catalog, we can use a soft assertion here.
 			await expect.soft(productCard.price, `Product ${i + 1} price should be visible`).toBeVisible();
 		}
 	}

@@ -2,7 +2,10 @@
 	"compilerOptions": {
 		"module": "ESNext",
 		"target": "ESNext",
-		"lib": ["ESNext", "DOM"],
+		"lib": [
+			"ESNext",
+			"DOM"
+		],
 		"sourceMap": true,
 		"moduleResolution": "Bundler",
 		"importHelpers": true,
@@ -12,8 +15,12 @@
 		"noFallthroughCasesInSwitch": true,
 		"baseUrl": "./",
 		"paths": {
-			"*": ["./src/*"],
-			"@utils/*": ["./src/shared/utils/*"]
+			"*": [
+				"./src/*"
+			],
+			"@utils/*": [
+				"./src/shared/utils/*"
+			]
 		},
 		"outDir": "./dist",
 		"esModuleInterop": true,
@@ -21,12 +28,19 @@
 		"forceConsistentCasingInFileNames": true,
 		"strict": true,
 		"declaration": false, // No need to generate declaration files (.d.ts) for a test project
-		"downlevelIteration": true, // Enables support for iterating on objects like `Map` and `Set` in older environments
-		"experimentalDecorators": true, // Enables experimental support for ES decorators
 		"noImplicitOverride": true, // Ensures that overriding methods in a subclass are marked with the 'override' keyword
 		"noImplicitReturns": true, // Ensures that all code paths in a function explicitly return a value
-		"types": ["@playwright/test", "node"]
+		"types": [
+			"@playwright/test",
+			"node"
+		]
 	},
-	"include": ["**/*.ts", "playwright.config.ts"],
-	"exclude": ["node_modules", "dist"]
+	"include": [
+		"**/*.ts",
+		"playwright.config.ts"
+	],
+	"exclude": [
+		"node_modules",
+		"dist"
+	]
 }

@@ -25,10 +25,15 @@ export class ReviewsPage extends BasePage {
 		this.thankYouMessage = this.page.getByText(TEXT_CONSTANTS.THANK_YOU_MSG, { exact: true }).first();
 	}
 
+	/** Returns true if the current page has at least one review with a thumbs-up button. */
 	async hasReviews(): Promise<boolean> {
 		return (await this.page.locator("[class*='thumbsUp']").count()) > 0;
 	}
 
+	/**
+	 * Opens the sort dropdown and selects the "Newest" option.
+	 * Uses `toPass()` internally to handle cookie banners or DOM re-renders.
+	 */
 	async sortByNewest(): Promise<void> {
 		await this.page.keyboard.press("End");
 
@@ -55,11 +60,13 @@ export class ReviewsPage extends BasePage {
 		});
 	}
 
+	/** Clicks the first visible thumbs-up button on the reviews list. */
 	async clickThumbsUp(): Promise<void> {
 		// click() already handles auto-scrolling and actionability checks
 		await this.thumbsUpButton.click();
 	}
 
+	/** Returns the locator for the "Teşekkür Ederiz." confirmation message. */
 	getThankYouMessageLocator(): Locator {
 		return this.thankYouMessage;
 	}
