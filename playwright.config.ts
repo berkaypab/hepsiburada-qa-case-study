@@ -68,6 +68,15 @@ export default defineConfig({
 			process.env.TEST_ENV === "staging"
 				? "https://staging.hepsiburada.com"
 				: "https://www.hepsiburada.com", // Default to production
+
+		// Locale and Timezone configuration to ensure tests running on US-based CI servers
+		// format currencies (₺), dates, and strings identically to local Turkish developer machines.
+		locale: "tr-TR",
+		timezoneId: "Europe/Istanbul",
+
+		// Maximum time each custom action (like click or fill) can take.
+		// Bounding this avoids a single hanging click consuming the full 60s global timeout.
+		actionTimeout: 15_000,
 	},
 
 	expect: {

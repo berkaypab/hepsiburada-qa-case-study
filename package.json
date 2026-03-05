@@ -12,6 +12,7 @@
 		"format:fix": "prettier --write .",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
+		"typecheck": "tsc --noEmit",
 		"test": "playwright test",
 		"test:ui": "playwright test --ui",
 		"test:api": "playwright test --project=api",
@@ -23,7 +24,9 @@
 		"test:trace": "playwright test --trace on",
 		"test:regression": "playwright test --grep @regression",
 		"test:customer": "playwright test --grep @customer",
+		"test:failed": "cross-env TEST_ENV=production playwright test --last-failed",
 		"test:report": "playwright show-report reports/playwright-report",
+		"show:trace": "playwright show-trace",
 		"codegen": "playwright codegen"
 	},
 	"keywords": [],

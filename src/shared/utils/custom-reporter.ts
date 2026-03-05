@@ -1,4 +1,4 @@
-import { Reporter, FullConfig, Suite, TestCase, TestResult, FullResult, TestStep } from "@playwright/test/reporter";
+import { Reporter, FullConfig, Suite, TestCase, TestResult, FullResult, TestStep, TestError } from "@playwright/test/reporter";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -61,6 +61,14 @@ class CustomReporter implements Reporter {
 		);
 	}
 
+	printsToStdio(): boolean {
+		return true; // We heavily use console.log, so we inform Playwright we print to stdio.
+	}
+
+	onError(error: TestError): void {
+		console.log(`\n${COLORS.red}${ICONS.cross}  GLOBAL ERROR ENCOUNTERED:${COLORS.reset}`);
+		console.log(`   ${COLORS.red}${error.message || error.value}${COLORS.reset}\n`);
+	}
 	onTestBegin(test: TestCase) {
 		const project = test.parent.project()?.name || "default";
 		console.log(
@@ -71,30 +79,30 @@ class CustomReporter implements Reporter {
 	onStepBegin(_test: TestCase, _result: TestResult, step: TestStep) {
 		if (step.category === "test.step") {
 			const indent = " ".repeat(step.title.split(">").length * 2);
-			console.log(`${indent}${COLORS.cyan}${ICONS.step} Step:${COLORS.reset} ${step.title}`);
+			console.log(`${indent}${COLORS.cyan}${ICONS.step} Step:${COLORS.reset} ${step.title} `);
 		}
 	}
 
 	onTestEnd(test: TestCase, result: TestResult) {
 		const project = test.parent.project()?.name || "default";
-		const duration = `${result.duration}ms`;
+		const duration = `${result.duration} ms`;
 
 		if (result.status === "passed") {
 			this.stats.passed++;
 			console.log(
-				`${COLORS.green}${ICONS.check}  PASSED:${COLORS.reset} [${project}] > ${test.title} (${COLORS.yellow}${duration}${COLORS.reset})\n`,
+				`${COLORS.green}${ICONS.check} PASSED:${COLORS.reset} [${project}] > ${test.title} (${COLORS.yellow}${duration}${COLORS.reset}) \n`,
 			);
 		} else if (result.status === "skipped") {
 			this.stats.skipped++;
-			console.log(`${COLORS.yellow}${ICONS.skip}  SKIPPED:${COLORS.reset} [${project}] > ${test.title}\n`);
+			console.log(`${COLORS.yellow}${ICONS.skip} SKIPPED:${COLORS.reset} [${project}] > ${test.title} \n`);
 		} else if (result.status === "failed" || result.status === "timedOut") {
 			this.stats.failed++;
 			console.log(
-				`${COLORS.red}${ICONS.cross}  FAILED:${COLORS.reset} [${project}] > ${test.title} (${COLORS.yellow}${duration}${COLORS.reset})`,
+				`${COLORS.red}${ICONS.cross} FAILED:${COLORS.reset} [${project}] > ${test.title} (${COLORS.yellow}${duration}${COLORS.reset})`,
 			);
 
 			if (result.error?.message) {
-				console.log(`   ${COLORS.red}Error:${COLORS.reset} ${result.error.message.split("\n")[0]}\n`);
+				console.log(`   ${COLORS.red} Error:${COLORS.reset} ${result.error.message.split("\n")[0]} \n`);
 			}
 
 			// Collect failed tests as a rich payload
@@ -103,7 +111,7 @@ class CustomReporter implements Reporter {
 				project: project,
 				duration: result.duration,
 				error: result.error?.stack || result.error?.message || "Unknown error occurred",
-				location: `${test.location.file}:${test.location.line}`,
+				location: `${test.location.file}:${test.location.line} `,
 				attachments: result.attachments.map((att) => ({
 					name: att.name,
 					path: att.path,
@@ -118,25 +126,25 @@ class CustomReporter implements Reporter {
 		const successRate = ((this.stats.passed / (this.stats.total || 1)) * 100).toFixed(1);
 
 		console.log(
-			`\n${COLORS.bright}${ICONS.flag}  Test Run Completed | Status: ${this.getStatusColor(result.status)}${result.status.toUpperCase()}${COLORS.reset}`,
+			`\n${COLORS.bright}${ICONS.flag}  Test Run Completed | Status: ${this.getStatusColor(result.status)}${result.status.toUpperCase()}${COLORS.reset} `,
 		);
 		console.log(
-			`${COLORS.bright}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${COLORS.reset}`,
+			`${COLORS.bright}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${COLORS.reset} `,
 		);
 		console.log(
 			`  Tests:    ${COLORS.green}${this.stats.passed} Passed${COLORS.reset} | ${COLORS.red}${this.stats.failed} Failed${COLORS.reset} | ${COLORS.yellow}${this.stats.skipped} Skipped${COLORS.reset} | ${this.stats.total} Total`,
 		);
 		console.log(
-			`  Duration: ${COLORS.yellow}${totalDuration}s${COLORS.reset} | Success Rate: ${this.getRateColor(successRate)}${successRate}%${COLORS.reset}`,
+			`  Duration: ${COLORS.yellow}${totalDuration}s${COLORS.reset} | Success Rate: ${this.getRateColor(successRate)}${successRate}% ${COLORS.reset} `,
 		);
 		console.log(
-			`${COLORS.bright}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${COLORS.reset}\n`,
+			`${COLORS.bright}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${COLORS.reset} \n`,
 		);
 
 		if (this.failedTests.length > 0) {
 			this.saveJiraPayload();
 		} else {
-			console.log(`🎉  ${COLORS.green}${COLORS.bright}PERFECT RUN! EVERYTHING PASSED.${COLORS.reset}\n`);
+			console.log(`🎉  ${COLORS.green}${COLORS.bright}PERFECT RUN! EVERYTHING PASSED.${COLORS.reset} \n`);
 		}
 	}
 
@@ -160,7 +168,7 @@ class CustomReporter implements Reporter {
 	}
 
 	private saveJiraPayload() {
-		console.log(`${ICONS.warn}  ${COLORS.yellow}Found failures. Generating Jira-ready JSON payload...${COLORS.reset}`);
+		console.log(`${ICONS.warn}  ${COLORS.yellow}Found failures.Generating Jira - ready JSON payload...${COLORS.reset} `);
 
 		const reportsDir = path.join(process.cwd(), "reports");
 		if (!fs.existsSync(reportsDir)) {
@@ -177,7 +185,7 @@ class CustomReporter implements Reporter {
 		};
 
 		fs.writeFileSync(payloadPath, JSON.stringify(payload, null, 2), "utf-8");
-		console.log(`${ICONS.save}  ${COLORS.cyan}Payload saved to:${COLORS.reset} ${payloadPath}\n`);
+		console.log(`${ICONS.save}  ${COLORS.cyan}Payload saved to:${COLORS.reset} ${payloadPath} \n`);
 	}
 }
 

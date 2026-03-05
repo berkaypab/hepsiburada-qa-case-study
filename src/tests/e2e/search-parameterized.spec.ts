@@ -26,7 +26,7 @@ test.describe(
                         description: `Searching functionality parameterized with: ${data.keyword}`,
                     },
                 },
-                async ({ homePage, page }) => {
+                async ({ homePage, searchPage, page }) => {
                     await test.step(`Search for keyword: ${data.keyword}`, async () => {
                         await homePage.header.search(data.keyword);
                     });
@@ -37,12 +37,9 @@ test.describe(
                     });
 
                     await test.step(`Verify result items are loaded`, async () => {
-                        // Using the search results page items locator logically
-                        const resultsList = page.locator("li").filter({ has: page.locator('[data-test-id^="title-"]') });
-                        await expect(resultsList.first()).toBeVisible({ timeout: TIMEOUTS.XXLARGE });
-
-                        const count = await resultsList.count();
-                        expect(count).toBeGreaterThan(0);
+                        // Use soft assertions on the Search Results Page
+                        // to validate visibility of title, link, and price for ALL items
+                        await searchPage.validateAllListedProducts();
                     });
                 },
             );

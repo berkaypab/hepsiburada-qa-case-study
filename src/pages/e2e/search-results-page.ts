@@ -88,6 +88,20 @@ export class SearchResultsPage extends BasePage {
 		if (!validData) throw new Error("No valid product card found.");
 		return validData;
 	}
+	async validateAllListedProducts(): Promise<void> {
+		await this.productListItems.first().waitFor({ state: "visible", timeout: 30000 });
+		const count = await this.productListItems.count();
 
+		for (let i = 0; i < count; i++) {
+			const item = this.productListItems.nth(i);
+			const productCard = new ProductCardComponent(item);
 
+			// Soft assertions ensure the test does not break immediately if one product has missing info
+			await expect.soft(productCard.title, `Product ${i + 1} title should be visible`).toBeVisible();
+			await expect.soft(productCard.link, `Product ${i + 1} link should be visible`).toBeVisible();
+			// Note: Price isn't always available on all items (e.g., sponsored elements or special bundles),
+			// but if it's considered mandatory in the catalog, this is the perfect place for a soft assertion.
+			await expect.soft(productCard.price, `Product ${i + 1} price should be visible`).toBeVisible();
+		}
+	}
 }

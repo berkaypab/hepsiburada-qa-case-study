@@ -9,7 +9,7 @@ test.describe('Verifying Homepage Sections', () => {
         // (This step is automatically handled by the homePage fixture mounting the baseURL)
 
         // 2. Verify that the homepage search box is visible
-        await expect(page.locator('[role="search"]')).toBeVisible({ timeout: 15000 });
+        await expect(page.getByPlaceholder(/Ürün, kategori veya marka ara/i).first()).toBeVisible({ timeout: 15000 });
 
         // 3. Verify that the product showcase/recommendation sections are visible
         // Hepsiburada homepage always contains "Süper Fiyat" or "Günün Fırsatları" or general product headers
