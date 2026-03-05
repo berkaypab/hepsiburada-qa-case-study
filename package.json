@@ -8,6 +8,8 @@
 	},
 	"scripts": {
 		"setup": "npm ci && playwright install",
+		"setup:ci": "npm ci && playwright install --with-deps",
+		"playwright:update": "npm i -D @playwright/test@latest && npx playwright install --with-deps",
 		"format": "prettier --check .",
 		"format:fix": "prettier --write .",
 		"lint": "eslint .",
