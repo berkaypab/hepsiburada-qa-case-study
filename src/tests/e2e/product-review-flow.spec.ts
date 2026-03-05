@@ -20,7 +20,6 @@ test.describe(
 			async ({ productSetup }) => {
 				const { pdp, reviews } = await productSetup(HB_DATA.SEARCH_TERM);
 
-
 				await test.step("Navigate to Reviews tab and sort by newest", async () => {
 					await pdp.clickReviewsTab();
 					// PageAssertions: check if URL ends with '-yorumlari' (ReviewsTab navigation verification)
@@ -33,7 +32,7 @@ test.describe(
 						return;
 					}
 
-						await reviews.sortByNewest();
+					await reviews.sortByNewest();
 				});
 
 				await test.step("Vote helpful on a review and verify thank you message", async () => {

@@ -42,21 +42,21 @@ export default defineConfig({
 
 	reporter: process.env.CI
 		? [
-			["github"],
-			["list"],
-			[
-				"html",
-				{ outputFolder: process.env.PLAYWRIGHT_HTML_REPORT_DIR || "reports/playwright-report", open: "never" },
-			],
-			["./src/shared/utils/custom-reporter.ts"],
-		]
+				["github"],
+				["list"],
+				[
+					"html",
+					{ outputFolder: process.env.PLAYWRIGHT_HTML_REPORT_DIR || "reports/playwright-report", open: "never" },
+				],
+				["./src/shared/utils/custom-reporter.ts"],
+			]
 		: [
-			[
-				"html",
-				{ outputFolder: process.env.PLAYWRIGHT_HTML_REPORT_DIR || "reports/playwright-report", open: "never" },
+				[
+					"html",
+					{ outputFolder: process.env.PLAYWRIGHT_HTML_REPORT_DIR || "reports/playwright-report", open: "never" },
+				],
+				["./src/shared/utils/custom-reporter.ts"],
 			],
-			["./src/shared/utils/custom-reporter.ts"],
-		],
 
 	use: {
 		screenshot: "only-on-failure",
@@ -64,10 +64,7 @@ export default defineConfig({
 		video: process.env.CI ? "on-first-retry" : "retain-on-failure",
 		testIdAttribute: "data-test-id",
 		// baseURL is dynamically set based on the environment variable
-		baseURL:
-			process.env.TEST_ENV === "staging"
-				? "https://staging.hepsiburada.com"
-				: "https://www.hepsiburada.com", // Default to production
+		baseURL: process.env.TEST_ENV === "staging" ? "https://staging.hepsiburada.com" : "https://www.hepsiburada.com", // Default to production
 
 		// Locale and Timezone configuration to ensure tests running on US-based CI servers
 		// format currencies (₺), dates, and strings identically to local Turkish developer machines.

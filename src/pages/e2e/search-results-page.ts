@@ -56,10 +56,7 @@ export class SearchResultsPage extends BasePage {
 
 		// Multi-Tab Handling: Capture the new tab that opens when clicking a product
 		// We use Promise.all to avoid race conditions between the click and the event listener
-		const [newPage] = await Promise.all([
-			this.page.context().waitForEvent("page"),
-			link.click()
-		]);
+		const [newPage] = await Promise.all([this.page.context().waitForEvent("page"), link.click()]);
 
 		// Wait for the PDP URL pattern instead of a generic loadState —
 		// more specific and aligns with Playwright's recommendation to
@@ -81,7 +78,7 @@ export class SearchResultsPage extends BasePage {
 			validData = {
 				title: await productCard.getTitle(),
 				price: await productCard.getPrice(),
-				link: productCard.link
+				link: productCard.link,
 			};
 		}).toPass({ timeout: 15000, intervals: [500, 1000] });
 

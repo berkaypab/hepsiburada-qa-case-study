@@ -31,6 +31,7 @@
 	},
 	"keywords": [],
 	"devDependencies": {
+		"@axe-core/playwright": "^4.11.1",
 		"@eslint/js": "^9.24.0",
 		"@playwright/test": "^1.58.2",
 		"@types/node": "^24.0.3",

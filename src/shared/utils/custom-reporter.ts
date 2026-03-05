@@ -1,4 +1,13 @@
-import { Reporter, FullConfig, Suite, TestCase, TestResult, FullResult, TestStep, TestError } from "@playwright/test/reporter";
+import {
+	Reporter,
+	FullConfig,
+	Suite,
+	TestCase,
+	TestResult,
+	FullResult,
+	TestStep,
+	TestError,
+} from "@playwright/test/reporter";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -168,7 +177,9 @@ class CustomReporter implements Reporter {
 	}
 
 	private saveJiraPayload() {
-		console.log(`${ICONS.warn}  ${COLORS.yellow}Found failures.Generating Jira - ready JSON payload...${COLORS.reset} `);
+		console.log(
+			`${ICONS.warn}  ${COLORS.yellow}Found failures.Generating Jira - ready JSON payload...${COLORS.reset} `,
+		);
 
 		const reportsDir = path.join(process.cwd(), "reports");
 		if (!fs.existsSync(reportsDir)) {
