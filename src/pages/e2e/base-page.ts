@@ -4,33 +4,33 @@ import { FooterComponent } from "./components/footer-component";
 import { TIMEOUTS } from "@utils/configuration";
 
 export abstract class BasePage {
-	readonly page: Page;
-	public readonly header: HeaderComponent;
-	public readonly footer: FooterComponent;
+    readonly page: Page;
+    public readonly header: HeaderComponent;
+    public readonly footer: FooterComponent;
 
-	constructor(page: Page) {
-		this.page = page;
-		this.header = new HeaderComponent(page);
-		this.footer = new FooterComponent(page);
-	}
+    constructor(page: Page) {
+        this.page = page;
+        this.header = new HeaderComponent(page);
+        this.footer = new FooterComponent(page);
+    }
 
-	async navigate(url: string) {
-		await this.page.goto(url, { waitUntil: "domcontentloaded" });
-	}
+    async navigate(url: string) {
+        await this.page.goto(url, { waitUntil: "domcontentloaded" });
+    }
 
-	async getRandomLocator(locatorList: Locator, maxLimit?: number): Promise<Locator> {
-		// Wait for at least one element in the list to be attached and visible
-		await locatorList.first().waitFor({ state: "visible", timeout: TIMEOUTS.XXLARGE });
+    async getRandomLocator(locatorList: Locator, maxLimit?: number): Promise<Locator> {
+        // Wait for at least one element in the list to be attached and visible
+        await locatorList.first().waitFor({ state: "visible", timeout: TIMEOUTS.XXLARGE });
 
-		const count = await locatorList.count();
-		if (count === 0) {
-			throw new Error("No items found in the list to select randomly.");
-		}
+        const count = await locatorList.count();
+        if (count === 0) {
+            throw new Error("No items found in the list to select randomly.");
+        }
 
-		// Apply limit if provided (e.g. only select from top 5 results)
-		const limit = maxLimit ? Math.min(count, maxLimit) : count;
-		const randomIndex = Math.floor(Math.random() * limit);
+        // Apply limit if provided (e.g. only select from top 5 results)
+        const limit = maxLimit ? Math.min(count, maxLimit) : count;
+        const randomIndex = Math.floor(Math.random() * limit);
 
-		return locatorList.nth(randomIndex);
-	}
+        return locatorList.nth(randomIndex);
+    }
 }

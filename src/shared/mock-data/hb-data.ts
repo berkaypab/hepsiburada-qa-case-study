@@ -1,3 +1,3 @@
 export const HB_DATA = {
-	SEARCH_TERM: "iphone",
+    SEARCH_TERM: "iphone",
 };

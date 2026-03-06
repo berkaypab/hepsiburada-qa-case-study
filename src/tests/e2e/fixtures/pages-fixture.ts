@@ -1,52 +1,49 @@
-import { test as base, errors } from "@playwright/test";
+import { test as base, errors, type Page } from "@playwright/test";
 import { HomePage, SearchResultsPage, ProductDetailPage, ReviewsPage, CartPage } from "pages/e2e";
-type PagesFixture = {
-	homePage: HomePage;
-	searchPage: SearchResultsPage;
-	productDetailPage: ProductDetailPage;
-	reviewsPage: ReviewsPage;
-	cartPage: CartPage;
-	productSetup: (term: string) => Promise<{
-		page: import("@playwright/test").Page;
-		pdp: ProductDetailPage;
-		reviews: ReviewsPage;
-		title: string;
-		price: string;
-	}>;
-};
+import AxeBuilder from "@axe-core/playwright";
+import type { PagesFixture } from "./types";
 
 export const test = base.extend<PagesFixture>({
-	homePage: async ({ page, context }, use) => {
-		await context.route(
-			/google-analytics|googletagmanager|hotjar|insider|facebook|doubleclick|segment/,
-			async (route) => {
-				await route.abort();
-			},
-		);
+	/**
+	 * Single atomic auto-fixture to handle context-level routing and page-level handlers.
+	 * Merging these ensures guaranteed execution order and prevents "Target page closed" errors.
+	 */
+	setupContext: [
+		async ({ context, page }, use) => {
+			// 1. Global Route Interception (Block Analytics/Trackers)
+			await context.route(
+				/google-analytics|googletagmanager|hotjar|insider|facebook|doubleclick|segment/,
+				async (route) => {
+					await route.abort();
+				},
+			);
 
-		await context.route("**/consent/**", async (route) => {
-			await route.continue();
-		});
+			// Ensure consent/other necessary routes continue
+			await context.route("**/consent/**", async (route) => {
+				await route.continue();
+			});
 
-		// Layer 2 — locatorHandler (click the banner if it still appears)
-		// noWaitAfter: true → action is not blocked; times: 3 → prevents infinite loops
-		await page.addLocatorHandler(
-			page.locator("#onetrust-accept-btn-handler"),
-			async () => {
-				await page
-					.locator("#onetrust-accept-btn-handler")
-					.click({ timeout: 3000 })
-					.catch((e: unknown) => {
-						// Only TimeoutError is expected — re-throw others
-						if (!(e instanceof errors.TimeoutError)) throw e;
-					});
-			},
-			{ noWaitAfter: true, times: 3 },
-		);
+			// 2. Global Cookie Banner Handler
+			await page.addLocatorHandler(
+				page.locator("#onetrust-accept-btn-handler"),
+				async () => {
+					await page
+						.locator("#onetrust-accept-btn-handler")
+						.click({ timeout: 3000 })
+						.catch((e: unknown) => {
+							if (!(e instanceof errors.TimeoutError)) throw e;
+						});
+				},
+				{ noWaitAfter: true, times: 3 },
+			);
 
-		await page.goto("/", {
-			waitUntil: "domcontentloaded",
-		});
+			await use();
+		},
+		{ auto: true },
+	],
+
+	homePage: async ({ page }, use) => {
+		// ELITE: Fixture is now lazy. Navigation responsibility is moved to the test or helper.
 		await use(new HomePage(page));
 	},
 
@@ -65,29 +62,50 @@ export const test = base.extend<PagesFixture>({
 	cartPage: async ({ page }, use) => {
 		await use(new CartPage(page));
 	},
+
 	/**
-	 * Runs the full product browsing setup (search → pick product → verify price).
-	 * Each step is wrapped in `base.step()` so the HTML report shows exactly which step failed.
-	 *
-	 * @param term - The keyword to search for (e.g. HB_DATA.SEARCH_TERM).
-	 * @returns Initialized POM objects and extracted title/price from the opened PDP tab.
+	 * Factory fixture for AxeBuilder.
+	 * FIXED: Now accepts a targetPage parameter to support multi-tab/tab-specific scans.
 	 */
-	productSetup: [
+	makeAxeBuilder: async ({ }, use) => {
+		const makeAxeBuilder = (targetPage: Page) =>
+			new AxeBuilder({ page: targetPage })
+				.withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+				.exclude("#reco-container")
+				.exclude("iframe");
+
+		await use(makeAxeBuilder);
+	},
+
+	/**
+	 * Atomic fixture for search + product selection.
+	 * ELITE: Smaller, single-responsibility fixture that can be reused in different scenarios.
+	 */
+	searchAndPickProduct: [
 		async ({ homePage, searchPage }, use) => {
-			const setup = async (term: string) => {
-				// Step 1 — Search
-				await base.step(`[Setup] Search for "${term}"`, async () => {
+			const fn = async (term: string) => {
+				await base.step(`[Setup] Search and Pick product for "${term}"`, async () => {
+					await homePage.navigate("/");
 					await homePage.header.search(term);
 				});
+				return await searchPage.selectRandomProduct();
+			};
+			await use(fn);
+		},
+		{ box: true },
+	],
 
-				// Step 2 — Pick a random product from the listing page
-				const result = await base.step("[Setup] Select random product from search results", async () => {
-					return await searchPage.selectRandomProduct();
-				});
-
+	/**
+	 * High-level setup flow.
+	 * ELITE: Now uses the smaller `searchAndPickProduct` fixture.
+	 */
+	productSetup: [
+		async ({ searchAndPickProduct }, use) => {
+			const setup = async (term: string) => {
+				const result = await searchAndPickProduct(term);
 				const newPage = result.newPage;
 
-				// Re-initialize POMs on the new tab using the already-imported classes directly
+				// Re-initialize POMs on the new tab
 				const pdp = new ProductDetailPage(newPage);
 				const reviews = new ReviewsPage(newPage);
 
@@ -95,10 +113,10 @@ export const test = base.extend<PagesFixture>({
 				await base.step("[Setup] Verify PDP URL and title", async () => {
 					await base.expect(newPage).toHaveURL(/hepsiburada\.com\/.*-p(m)?-/i, { timeout: 10000 });
 					const partialKey = result.title.split(" ").slice(0, 3).join(" ");
-					await base.expect(pdp.productTitleLocator).toContainText(partialKey, { ignoreCase: true });
+					await base.expect(pdp.productTitle).toContainText(partialKey, { ignoreCase: true });
 				});
 
-				// Step 4 — Soft-assert price consistency between listing and PDP
+				// Step 4 — Soft-assert price consistency
 				await base.step("[Setup] Verify price consistency (soft)", async () => {
 					const detailPrice = await pdp.getMainPrice();
 					if (result.price && detailPrice) {

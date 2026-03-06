@@ -1,46 +1,35 @@
 {
-	"compilerOptions": {
-		"module": "ESNext",
-		"target": "ESNext",
-		"lib": [
-			"ESNext",
-			"DOM"
-		],
-		"sourceMap": true,
-		"moduleResolution": "Bundler",
-		"importHelpers": true,
-		"skipLibCheck": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"noFallthroughCasesInSwitch": true,
-		"baseUrl": "./",
-		"paths": {
-			"*": [
-				"./src/*"
-			],
-			"@utils/*": [
-				"./src/shared/utils/*"
-			]
-		},
-		"outDir": "./dist",
-		"esModuleInterop": true,
-		"resolveJsonModule": true,
-		"forceConsistentCasingInFileNames": true,
-		"strict": true,
-		"declaration": false, // No need to generate declaration files (.d.ts) for a test project
-		"noImplicitOverride": true, // Ensures that overriding methods in a subclass are marked with the 'override' keyword
-		"noImplicitReturns": true, // Ensures that all code paths in a function explicitly return a value
-		"types": [
-			"@playwright/test",
-			"node"
-		]
-	},
-	"include": [
-		"**/*.ts",
-		"playwright.config.ts"
-	],
-	"exclude": [
-		"node_modules",
-		"dist"
-	]
+    "compilerOptions": {
+        /*
+         * NOTE: Playwright only supports: allowJs, baseUrl, paths, and references.
+         * Other options (strict, etc.) are ignored by Playwright's internal loader
+         * and are only enforced via `npm run typecheck` (tsc).
+         */
+        "module": "ESNext",
+        "target": "ESNext",
+        "lib": ["ESNext", "DOM"],
+        "sourceMap": true,
+        "moduleResolution": "Bundler",
+        "importHelpers": true,
+        "skipLibCheck": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true,
+        "baseUrl": "./",
+        "paths": {
+            "*": ["./src/*"],
+            "@utils/*": ["./src/shared/utils/*"]
+        },
+        "outDir": "./dist",
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "declaration": false, // No need to generate declaration files (.d.ts) for a test project
+        "noImplicitOverride": true, // Ensures that overriding methods in a subclass are marked with the 'override' keyword
+        "noImplicitReturns": true, // Ensures that all code paths in a function explicitly return a value
+        "types": ["@playwright/test", "node"]
+    },
+    "include": ["**/*.ts", "playwright.config.ts"],
+    "exclude": ["node_modules", "dist"]
 }

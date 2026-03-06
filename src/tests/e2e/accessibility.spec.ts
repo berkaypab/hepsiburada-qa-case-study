@@ -1,77 +1,76 @@
 import { test, expect } from "./fixtures/pages-fixture";
-import AxeBuilder from "@axe-core/playwright";
 import { TAGS } from "@utils/configuration";
+import { CartPage } from "pages/e2e";
 
 /**
  * @fileoverview Accessibility (a11y) Scenarios
- * Runs axe-core scans on the Homepage, PDP, and Cart pages.
- * Tagged @slow — excluded from the default `test:e2e` run.
- * To run explicitly: npx playwright test --grep @slow
+ * Standardized WCAG 2.1/2.2 compliance scans using axe-core.
+ *
+ * @note Automated scans typically detect ~57% of digital accessibility issues.
+ * Manual verification with screen readers and keyboard-only navigation is still required.
  */
-test.describe(
-	"Accessibility (a11y) Scenarios",
-	{
-		annotation: {
-			type: "feature",
-			description: "Automated accessibility scans using axe-core to ensure WCAG compliance on key pages",
+test.describe("Hepsiburada — Scenario 5: Accessibility Compliance", () => {
+	test.describe.configure({ mode: "parallel" });
+
+	test(
+		"Should verify homepage is WCAG compliant",
+		{ tag: [TAGS.REGRESSION, "@slow"] },
+		async ({ page, homePage, makeAxeBuilder }) => {
+			// Navigation is now manual because the fixture is lazy
+			await page.goto("/", { waitUntil: "domcontentloaded" });
+			// Use a specific locator instead of networkidle
+			await expect(homePage.header.searchBox).toBeVisible({ timeout: 15000 });
+
+			const results = await makeAxeBuilder(page).analyze();
+
+			await test.info().attach("homepage-a11y-violations", {
+				body: JSON.stringify(results.violations, null, 2),
+				contentType: "application/json",
+			});
+
+			expect.soft(results.violations, "Homepage has WCAG violations").toEqual([]);
 		},
-	},
-	() => {
-		test(
-			"Key pages should not have any automatically detectable accessibility violations",
-			{
-				tag: [TAGS.REGRESSION, TAGS.CUSTOMER, "@slow"],
-			},
-			async ({ page, productSetup }) => {
-				// 1. Homepage Accessibility Scan
-				await test.step("Scan Homepage for Accessibility", async () => {
-					// Explicitly navigate to the homepage since the homePage fixture was removed to satisfy linter
-					await page.goto("/", { waitUntil: "domcontentloaded" });
+	);
 
-					const results = await new AxeBuilder({ page }).analyze();
+	test(
+		"Should verify Product Detail Page (PDP) is WCAG compliant",
+		{ tag: [TAGS.REGRESSION, "@slow"] },
+		async ({ productSetup, makeAxeBuilder }) => {
+			const { pdp, page } = await productSetup("iphone");
+			// Use PDP specific locator instead of networkidle
+			await expect(pdp.productTitle).toBeVisible({ timeout: 15000 });
 
-					await test.info().attach("homepage-accessibility-results", {
-						body: JSON.stringify(results.violations, null, 2),
-						contentType: "application/json",
-					});
+			const results = await makeAxeBuilder(page).analyze();
 
-					// Use soft assertions so that the test continues to scan the other pages even if homepage fails
-					expect.soft(results.violations).toEqual([]);
-				});
+			await test.info().attach("pdp-a11y-violations", {
+				body: JSON.stringify(results.violations, null, 2),
+				contentType: "application/json",
+			});
 
-				// 2. Search and Product Detail Page (PDP) Scan
-				const { pdp } = await productSetup("iphone");
+			expect.soft(results.violations, "PDP has WCAG violations").toEqual([]);
+		},
+	);
 
-				await test.step("Scan Product Detail Page Accessibility", async () => {
-					// Give product page some time to stabilize
-					await pdp.page.waitForLoadState("domcontentloaded");
+	test(
+		"Should verify Cart Page is WCAG compliant",
+		{ tag: [TAGS.REGRESSION, "@slow"] },
+		async ({ productSetup, makeAxeBuilder }) => {
+			const { pdp, page } = await productSetup("iphone");
+			await pdp.addToCart();
+			await page.goto("/sepet", { waitUntil: "domcontentloaded" });
 
-					const pdpResults = await new AxeBuilder({ page: pdp.page }).analyze();
+			// ELITE: POM-based wait instead of inline locator or networkidle.
+			const cartPage = new CartPage(page);
+			await expect(cartPage.pageTitle).toBeVisible({ timeout: 15000 });
 
-					await test.info().attach("pdp-accessibility-results", {
-						body: JSON.stringify(pdpResults.violations, null, 2),
-						contentType: "application/json",
-					});
+			const results = await makeAxeBuilder(page).analyze();
 
-					expect.soft(pdpResults.violations).toEqual([]);
-				});
+			await test.info().attach("cart-a11y-violations", {
+				body: JSON.stringify(results.violations, null, 2),
+				contentType: "application/json",
+			});
 
-				// 3. Cart Page Scan
-				await test.step("Scan Cart Page Accessibility", async () => {
-					// Add product to cart and explicitly navigate to the cart page
-					await pdp.addToCart();
-					await pdp.page.goto("/sepet", { waitUntil: "domcontentloaded" });
-
-					const cartResults = await new AxeBuilder({ page: pdp.page }).analyze();
-
-					await test.info().attach("cart-accessibility-results", {
-						body: JSON.stringify(cartResults.violations, null, 2),
-						contentType: "application/json",
-					});
-
-					expect.soft(cartResults.violations).toEqual([]);
-				});
-			},
-		);
-	},
-);
+			expect.soft(results.violations, "Cart Page has WCAG violations").toEqual([]);
+		},
+	);
+});

@@ -3,71 +3,66 @@ import { BasePage } from "./base-page";
 import { TIMEOUTS } from "@utils/configuration";
 
 const TEXT_CONSTANTS = {
-	THANK_YOU_MSG: "Teşekkür Ederiz.",
-	SORT_NEWEST_REGEX: /En yeni değerlendirme/i,
+    THANK_YOU_MSG: "Teşekkür Ederiz.",
+    SORT_NEWEST_REGEX: /En yeni değerlendirme/i,
 };
 
 export class ReviewsPage extends BasePage {
-	private readonly sortNewestOption: Locator;
-	private readonly thumbsUpButton: Locator;
-	private readonly thankYouMessage: Locator;
+    public readonly sortNewestOption: Locator;
+    public readonly thumbsUpButton: Locator;
+    public readonly thankYouMessage: Locator;
 
-	constructor(page: Page) {
-		super(page);
-		this.sortNewestOption = this.page.getByText(TEXT_CONSTANTS.SORT_NEWEST_REGEX);
-		// Role-based logic failed because it's a generic div.
-		// Best practice: Anchor to the visible text section and use a descriptive sub-locator.
-		this.thumbsUpButton = this.page
-			.locator("div")
-			.filter({ hasText: "Bu değerlendirme faydalı mı?" })
-			.locator(".thumbsUp")
-			.first();
-		this.thankYouMessage = this.page.getByText(TEXT_CONSTANTS.THANK_YOU_MSG, { exact: true }).first();
-	}
+    constructor(page: Page) {
+        super(page);
+        this.sortNewestOption = this.page.getByText(TEXT_CONSTANTS.SORT_NEWEST_REGEX);
+        // Role-based logic failed because it's a generic div.
+        // Best practice: Anchor to the visible text section and use a descriptive sub-locator.
+        this.thumbsUpButton = this.page
+            .locator("div")
+            .filter({ hasText: "Bu değerlendirme faydalı mı?" })
+            .locator(".thumbsUp")
+            .first();
+        this.thankYouMessage = this.page.getByText(TEXT_CONSTANTS.THANK_YOU_MSG, { exact: true }).first();
+    }
 
-	/** Returns true if the current page has at least one review with a thumbs-up button. */
-	async hasReviews(): Promise<boolean> {
-		return (await this.page.locator("[class*='thumbsUp']").count()) > 0;
-	}
+    /** Returns true if the current page has at least one review with a thumbs-up button. */
+    async hasReviews(): Promise<boolean> {
+        return (await this.page.locator("[class*='thumbsUp']").count()) > 0;
+    }
 
-	/**
-	 * Opens the sort dropdown and selects the "Newest" option.
-	 * Uses `toPass()` internally to handle cookie banners or DOM re-renders.
-	 */
-	async sortByNewest(): Promise<void> {
-		await this.page.keyboard.press("End");
+    /**
+     * Opens the sort dropdown and selects the "Newest" option.
+     * Uses `toPass()` internally to handle cookie banners or DOM re-renders.
+     */
+    async sortByNewest(): Promise<void> {
+        await this.page.keyboard.press("End");
 
-		// Sort dropdown trigger: "Varsayılan" text — stable across all browsers
-		const sortTrigger = this.page
-			.locator("[class*='Sort-module']")
-			.getByText(/^Varsayılan$/)
-			.first();
+        // Sort dropdown trigger: "Varsayılan" text — stable across all browsers
+        const sortTrigger = this.page
+            .locator("[class*='Sort-module']")
+            .getByText(/^Varsayılan$/)
+            .first();
 
-		// toPass() with retry: retries the whole sequence in case of cookie banner or DOM re-renders
-		// scrollIntoViewIfNeeded() IS NOT USED — click() already handles auto-scrolling (Playwright docs)
-		// An explicit scrollIntoViewIfNeeded() call could lead to stale element errors after a DOM re-render
-		await expect(async () => {
-			await sortTrigger.waitFor({ state: "visible", timeout: TIMEOUTS.LARGE });
-			await sortTrigger.click();
-			await this.sortNewestOption.waitFor({ state: "visible", timeout: TIMEOUTS.LARGE });
-			await this.sortNewestOption.click();
-		}).toPass({ timeout: TIMEOUTS.XXLARGE });
+        // toPass() with retry: retries the whole sequence in case of cookie banner or DOM re-renders
+        // scrollIntoViewIfNeeded() IS NOT USED — click() already handles auto-scrolling (Playwright docs)
+        // An explicit scrollIntoViewIfNeeded() call could lead to stale element errors after a DOM re-render
+        await expect(async () => {
+            await sortTrigger.waitFor({ state: "visible", timeout: TIMEOUTS.LARGE });
+            await sortTrigger.click();
+            await this.sortNewestOption.waitFor({ state: "visible", timeout: TIMEOUTS.LARGE });
+            await this.sortNewestOption.click();
+        }).toPass({ timeout: TIMEOUTS.XXLARGE });
 
-		// Wait until thumbs-up buttons render after sorting
-		// Only TimeoutError is suppressed — other errors are re-thrown (playwright.errors API)
-		await this.thumbsUpButton.waitFor({ state: "visible", timeout: TIMEOUTS.LARGE }).catch((e: unknown) => {
-			if (!(e instanceof errors.TimeoutError)) throw e;
-		});
-	}
+        // Wait until thumbs-up buttons render after sorting
+        // Only TimeoutError is suppressed — other errors are re-thrown (playwright.errors API)
+        await this.thumbsUpButton.waitFor({ state: "visible", timeout: TIMEOUTS.LARGE }).catch((e: unknown) => {
+            if (!(e instanceof errors.TimeoutError)) throw e;
+        });
+    }
 
-	/** Clicks the first visible thumbs-up button on the reviews list. */
-	async clickThumbsUp(): Promise<void> {
-		// click() already handles auto-scrolling and actionability checks
-		await this.thumbsUpButton.click();
-	}
-
-	/** Returns the locator for the "Teşekkür Ederiz." confirmation message. */
-	getThankYouMessageLocator(): Locator {
-		return this.thankYouMessage;
-	}
+    /** Clicks the first visible thumbs-up button on the reviews list. */
+    async clickThumbsUp(): Promise<void> {
+        // click() already handles auto-scrolling and actionability checks
+        await this.thumbsUpButton.click();
+    }
 }
