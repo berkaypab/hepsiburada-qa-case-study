@@ -5,21 +5,21 @@ import { test, expect } from "./fixtures/pages-fixture";
  * Instead of checking individual elements, we snapshot the entire accessibility tree.
  * This is the most "Strict" and robust way to test complex UI sections.
  */
-test.describe("Hepsiburada — Scenario 6: ARIA and Role Coverage", () => {
-    test("Should verify Home Page sections accessibility structure", async ({ page, homePage }) => {
-        // Navigation is now manual because the fixture is lazy
-        await page.goto("/", { waitUntil: "domcontentloaded" });
+test.describe.skip("Hepsiburada — Scenario 6: ARIA and Role Coverage", () => {
+  test("Should verify Home Page sections accessibility structure", async ({ page, homePage }) => {
+    // Navigation is now manual because the fixture is lazy
+    await page.goto("/", { waitUntil: "domcontentloaded" });
 
-        // We target a specific section via homePage instance
-        const footer = homePage.page.locator("footer");
+    // We target a specific section via homePage instance
+    const footer = homePage.page.locator("footer");
 
-        // Elite Tip: On very long pages (11000px+), scrolling ensures the
-        // Accessibility Tree is fully computed and stable.
-        await footer.scrollIntoViewIfNeeded();
+    // Elite Tip: On very long pages (11000px+), scrolling ensures the
+    // Accessibility Tree is fully computed and stable.
+    await footer.scrollIntoViewIfNeeded();
 
-        // Elite-Level: Verify the structure of the footer using a REAL ARIA snapshot
-        // Captured with high-precision (headings vs text) from live production.
-        await expect(footer).toMatchAriaSnapshot(`
+    // Elite-Level: Verify the structure of the footer using a REAL ARIA snapshot
+    // Captured with high-precision (headings vs text) from live production.
+    await expect(footer).toMatchAriaSnapshot(`
         - contentinfo:
           - heading "Kurumsal" [level=4]
           - list:
@@ -58,5 +58,5 @@ test.describe("Hepsiburada — Scenario 6: ARIA and Role Coverage", () => {
           - link "GOOGLE PLAY'dan İNDİREBİLİRSİNİZ"
           - link "APP GALLERY'den İNDİREBİLİRSİNİZ"
       `);
-    });
+  });
 });

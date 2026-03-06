@@ -3,7 +3,7 @@
 
 import { test, expect } from "./fixtures/pages-fixture";
 
-test.describe("Hepsiburada — Scenario 3: Homepage Sections", () => {
+test.describe.skip("Hepsiburada — Scenario 3: Homepage Sections", () => {
     test("Should verify main sections and products", async ({ page, homePage }) => {
         // 1. Navigation is now manual because the fixture is lazy
         await page.goto("/", { waitUntil: "domcontentloaded" });

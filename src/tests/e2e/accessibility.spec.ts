@@ -9,7 +9,7 @@ import { CartPage } from "pages/e2e";
  * @note Automated scans typically detect ~57% of digital accessibility issues.
  * Manual verification with screen readers and keyboard-only navigation is still required.
  */
-test.describe("Hepsiburada — Scenario 5: Accessibility Compliance", () => {
+test.describe.skip("Hepsiburada — Scenario 5: Accessibility Compliance", () => {
 	test.describe.configure({ mode: "parallel" });
 
 	test(

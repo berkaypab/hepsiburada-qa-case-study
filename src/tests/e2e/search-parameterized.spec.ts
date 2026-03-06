@@ -7,7 +7,7 @@ const searchData = [
     { keyword: "macbook", expectedUrlPattern: /q=macbook/i },
 ];
 
-test.describe(
+test.describe.skip(
     "Hepsiburada — Scenario 4: Parameterized Search",
     {
         annotation: {

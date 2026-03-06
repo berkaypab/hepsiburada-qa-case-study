@@ -101,6 +101,16 @@ export default defineConfig({
 			},
 		},
 
+		// ── Seed project for Playwright Test Agents (Planner / Generator bootstrap)
+		{
+			name: "seed",
+			testMatch: /.*seed\.spec\.ts/,
+			use: {
+				...devices["Desktop Chrome"],
+				channel: "chrome",
+			},
+		},
+
 		// ── Web Browsers Matrix
 		{
 			name: "chrome",
